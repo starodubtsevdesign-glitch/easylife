@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyLife — Умное питание с ИИ</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F4F6FA;
+  --white: #FFFFFF;
+  --dark: #111318;
+  --text: #1A1D26;
+  --muted: #8A90A2;
+  --border: #E8EAF0;
+  --primary: #22C55E;
+  --primary-d: #16A34A;
+  --primary-l: #F0FDF4;
+  --primary-m: #BBF7D0;
+  --teal: #2DBE8A;
+  --yellow: #FFB800;
+  --r: 20px; --r-sm: 14px; --r-xs: 10px;
+  --sh: 0 4px 24px rgba(0,0,0,.07);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family:'Nunito Sans',sans-serif; background:var(--white); color:var(--text); }
+button { font-family:inherit; cursor:pointer; border:none; background:none; }
+img { max-width:100%; }
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top:0; z-index:100;
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 16px 48px;
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-family:'Nunito',sans-serif; font-size:22px; font-weight:900; color:var(--dark); letter-spacing:-.5px; }
+.logo span { color:var(--primary); }
+.nav-right { display:flex; align-items:center; gap:10px; }
+.btn-ghost { padding:9px 20px; border:1.5px solid var(--border); border-radius:50px; font-size:14px; font-weight:700; color:var(--text); transition:all .2s; }
+.btn-ghost:hover { border-color:var(--primary); color:var(--primary); }
+.btn-cta { padding:10px 24px; background:var(--primary); border-radius:50px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:#fff; box-shadow:0 4px 14px rgba(34,197,94,.35); transition:all .2s; }
+.btn-cta:hover { background:var(--primary-d); transform:translateY(-1px); box-shadow:0 6px 18px rgba(34,197,94,.4); }
+
+/* ── HERO ── */
+.hero {
+  max-width: 1200px; margin:0 auto;
+  padding: 80px 48px 60px;
+  display: grid; grid-template-columns: 1fr 480px; gap:64px; align-items:center;
+}
+.hero-tag { display:inline-flex; align-items:center; gap:8px; background:var(--primary-l); border-radius:50px; padding:7px 16px; margin-bottom:24px; }
+.tag-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+.tag-txt { font-size:12px; font-weight:800; color:var(--primary-d); text-transform:uppercase; letter-spacing:.8px; }
+.hero-h1 { font-family:'Nunito',sans-serif; font-size:clamp(36px,4vw,58px); font-weight:900; line-height:1.08; letter-spacing:-.5px; color:var(--dark); margin-bottom:20px; }
+.hero-h1 em { font-style:normal; color:var(--primary); }
+.hero-p { font-size:17px; line-height:1.7; color:var(--muted); margin-bottom:36px; max-width:460px; }
+.hero-btns { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:36px; }
+.btn-hero { padding:16px 36px; background:var(--primary); border-radius:50px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; color:#fff; box-shadow:0 8px 24px rgba(34,197,94,.35); transition:all .2s; display:inline-flex; align-items:center; gap:10px; }
+.btn-hero:hover { background:var(--primary-d); transform:translateY(-2px); box-shadow:0 12px 30px rgba(34,197,94,.4); }
+.btn-hero-ghost { padding:16px 28px; border:2px solid var(--border); border-radius:50px; font-family:'Nunito',sans-serif; font-size:15px; font-weight:700; color:var(--text); transition:all .2s; }
+.btn-hero-ghost:hover { border-color:var(--primary); color:var(--primary); }
+.hero-trust { display:flex; align-items:center; gap:14px; }
+.trust-avatars { display:flex; }
+.trust-avatar { width:32px; height:32px; border-radius:50%; border:2px solid #fff; background:linear-gradient(135deg,var(--primary),var(--primary-d)); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; margin-left:-8px; }
+.trust-avatar:first-child { margin-left:0; }
+.trust-text { font-size:13px; color:var(--muted); line-height:1.4; }
+.trust-text strong { color:var(--dark); display:block; }
+
+/* ── HERO VISUAL ── */
+.hero-visual { position:relative; height:560px; }
+.phone-frame {
+  position: absolute; left:50%; top:0; transform:translateX(-50%);
+  width:260px;
+  background:var(--dark);
+  border-radius:44px;
+  padding:14px;
+  box-shadow:0 40px 80px rgba(17,19,24,.25), 0 0 0 1px rgba(255,255,255,.05);
+  z-index:2;
+}
+.phone-notch { width:80px; height:24px; background:var(--dark); border-radius:0 0 16px 16px; margin:0 auto 10px; position:relative; z-index:3; }
+.phone-screen { background:var(--bg); border-radius:32px; overflow:hidden; }
+.ps-header { background:var(--dark); padding:16px 16px 20px; }
+.ps-greeting { font-size:11px; color:rgba(255,255,255,.4); font-weight:600; margin-bottom:2px; }
+.ps-name { font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:#fff; margin-bottom:14px; }
+.ps-cal-row { display:flex; justify-content:space-between; align-items:flex-end; }
+.ps-cal-num { font-family:'Nunito',sans-serif; font-size:32px; font-weight:900; color:#fff; line-height:1; }
+.ps-cal-of { font-size:12px; color:rgba(255,255,255,.35); margin-top:3px; }
+.ps-ring-wrap { position:relative; width:64px; height:64px; }
+.ps-ring-wrap svg { transform:rotate(-90deg); }
+.ps-ring-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.ps-ring-pct { font-family:'Nunito',sans-serif; font-size:14px; font-weight:900; color:#fff; }
+.ps-macro-row { display:flex; gap:8px; margin-top:12px; }
+.ps-macro { flex:1; }
+.ps-macro-lbl { font-size:9px; color:rgba(255,255,255,.35); margin-bottom:3px; font-weight:600; text-transform:uppercase; }
+.ps-macro-bar { height:4px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; }
+.ps-macro-fill { height:100%; border-radius:2px; }
+.ps-meals { padding:12px; }
+.ps-meal { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); }
+.ps-meal:last-child { border:none; }
+.ps-meal-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.ps-meal-name { font-size:11px; font-weight:700; color:var(--dark); flex:1; line-height:1.2; }
+.ps-meal-kcal { font-size:11px; font-weight:800; color:var(--primary); }
+
+/* Float cards */
+.float-card { position:absolute; background:#fff; border-radius:var(--r-sm); padding:12px 16px; box-shadow:var(--sh); display:flex; align-items:center; gap:10px; z-index:3; }
+.fc-1 { left:-10px; top:80px; animation:floatA 4s ease-in-out infinite; }
+.fc-2 { right:-20px; top:220px; animation:floatB 4s ease-in-out infinite .8s; }
+.fc-3 { left:0px; bottom:80px; animation:floatA 5s ease-in-out infinite .4s; }
+@keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+.fc-icon { font-size:28px; }
+.fc-label { font-size:11px; color:var(--muted); font-weight:600; }
+.fc-val { font-family:'Nunito',sans-serif; font-size:17px; font-weight:900; color:var(--dark); }
+
+/* ── STATS STRIP ── */
+.stats-strip { background:var(--dark); padding:48px; }
+.stats-strip-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:2px; }
+.stat-item { padding:28px 32px; border-right:1px solid rgba(255,255,255,.07); }
+.stat-item:last-child { border:none; }
+.stat-num { font-family:'Nunito',sans-serif; font-size:42px; font-weight:900; color:var(--primary); }
+.stat-lbl { font-size:14px; color:rgba(255,255,255,.4); margin-top:4px; line-height:1.4; }
+
+/* ── HOW ── */
+.how { padding:100px 48px; max-width:1200px; margin:0 auto; }
+.section-eyebrow { font-size:12px; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+.section-h { font-family:'Nunito',sans-serif; font-size:clamp(28px,3vw,44px); font-weight:900; color:var(--dark); margin-bottom:56px; }
+.how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.how-card { background:var(--bg); border-radius:var(--r); padding:32px; position:relative; overflow:hidden; transition:transform .2s; }
+.how-card:hover { transform:translateY(-4px); }
+.how-card::after { content:''; position:absolute; right:-20px; bottom:-20px; width:100px; height:100px; border-radius:50%; background:var(--primary-l); }
+.how-num { font-family:'Nunito',sans-serif; font-size:52px; font-weight:900; color:var(--primary-m); line-height:1; margin-bottom:16px; }
+.how-icon { font-size:36px; margin-bottom:14px; }
+.how-title { font-family:'Nunito',sans-serif; font-size:19px; font-weight:900; color:var(--dark); margin-bottom:10px; }
+.how-txt { font-size:14px; color:var(--muted); line-height:1.65; }
+
+/* ── FEATURES ── */
+.features { padding:0 48px 100px; max-width:1200px; margin:0 auto; }
+.features-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.feature-card { background:var(--bg); border-radius:var(--r); padding:28px 32px; display:flex; gap:18px; align-items:flex-start; }
+.feature-icon-wrap { width:52px; height:52px; border-radius:var(--r-sm); background:var(--primary-l); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+.feature-title { font-family:'Nunito',sans-serif; font-size:17px; font-weight:800; color:var(--dark); margin-bottom:6px; }
+.feature-txt { font-size:14px; color:var(--muted); line-height:1.6; }
+
+/* ── PRICING ── */
+.pricing { background:var(--bg); padding:100px 48px; }
+.pricing-inner { max-width:860px; margin:0 auto; }
+.pricing-header { text-align:center; margin-bottom:48px; }
+.pricing-card {
+  background:var(--dark);
+  border-radius:28px;
+  padding:48px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:48px;
+  align-items:center;
+  position:relative; overflow:hidden;
+}
+.pricing-card::before { content:''; position:absolute; right:-60px; top:-60px; width:300px; height:300px; border-radius:50%; background:radial-gradient(circle,rgba(34,197,94,.15) 0%,transparent 60%); }
+.price-num { font-family:'Nunito',sans-serif; font-size:80px; font-weight:900; color:#fff; line-height:1; }
+.price-num sup { font-size:32px; vertical-align:top; margin-top:16px; display:inline-block; }
+.price-per { font-size:18px; color:rgba(255,255,255,.35); margin-top:6px; }
+.price-free { display:inline-flex; align-items:center; gap:8px; background:rgba(34,197,94,.2); border-radius:50px; padding:8px 18px; margin-top:20px; }
+.price-free-txt { font-size:13px; font-weight:700; color:var(--primary); }
+.price-cta { width:100%; padding:16px; background:var(--primary); border-radius:50px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; color:#fff; margin-top:28px; box-shadow:0 8px 24px rgba(34,197,94,.4); transition:all .2s; }
+.price-cta:hover { background:var(--primary-d); transform:translateY(-2px); }
+.price-demo { display:block; text-align:center; font-size:13px; color:rgba(255,255,255,.3); margin-top:12px; cursor:pointer; }
+.price-demo:hover { color:rgba(255,255,255,.6); }
+.perks-list { list-style:none; display:flex; flex-direction:column; gap:16px; }
+.perk { display:flex; align-items:center; gap:14px; font-size:15px; color:rgba(255,255,255,.7); }
+.perk-check { width:26px; height:26px; border-radius:50%; background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.4); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--primary); flex-shrink:0; }
+
+/* ── FOOTER ── */
+footer { padding:40px 48px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.footer-logo { font-family:'Nunito',sans-serif; font-size:20px; font-weight:900; color:var(--dark); }
+.footer-logo span { color:var(--primary); }
+.footer-txt { font-size:13px; color:var(--muted); }
+
+/* ── LANG ── */
+.lang-bar { display:flex; gap:4px; }
+.lang-btn { padding:5px 11px; border:1.5px solid var(--border); border-radius:8px; font-size:12px; font-weight:700; color:var(--muted); transition:all .2s; }
+.lang-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width:1024px) {
+  .hero { grid-template-columns:1fr; text-align:center; padding:60px 32px 40px; }
+  .hero-p { margin-left:auto; margin-right:auto; }
+  .hero-btns { justify-content:center; }
+  .hero-trust { justify-content:center; }
+  .hero-visual { display:none; }
+  .stats-strip { padding:40px 32px; }
+  .stats-strip-inner { grid-template-columns:repeat(2,1fr); }
+  .how { padding:60px 32px; }
+  .how-grid { grid-template-columns:1fr 1fr; }
+  .features { padding:0 32px 60px; }
+  .pricing { padding:60px 32px; }
+  .pricing-card { grid-template-columns:1fr; }
+  footer { padding:32px; flex-direction:column; gap:12px; text-align:center; }
+}
+@media (max-width:768px) {
+  .nav { padding:14px 20px; }
+  .nav-right .btn-ghost { display:none; }
+  .hero { padding:40px 20px; gap:32px; }
+  .stats-strip { padding:32px 20px; }
+  .stats-strip-inner { grid-template-columns:1fr 1fr; }
+  .stat-item { padding:20px; border:none; }
+  .how { padding:48px 20px; }
+  .how-grid { grid-template-columns:1fr; }
+  .features { padding:0 20px 48px; }
+  .features-grid { grid-template-columns:1fr; }
+  .pricing { padding:48px 20px; }
+  .pricing-card { padding:28px 24px; }
+  .price-num { font-size:60px; }
+  footer { padding:24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">Easy<span>Life</span></div>
+  <div class="nav-right">
+    <div class="lang-bar">
+      <button class="lang-btn active" onclick="setLang('ru',this)">RU</button>
+      <button class="lang-btn" onclick="setLang('en',this)">EN</button>
+      <button class="lang-btn" onclick="setLang('es',this)">ES</button>
+    </div>
+    <button class="btn-ghost" onclick="goApp('login')" data-t="nav_login">Войти</button>
+    <button class="btn-cta" onclick="goApp('register')" data-t="nav_cta">Начать бесплатно</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-tag"><div class="tag-dot"></div><span class="tag-txt" data-t="tag">ИИ-нутрициолог</span></div>
+    <h1 class="hero-h1" data-t="h1">Твой ежедневный гид<br>к <em>умному питанию</em></h1>
+    <p class="hero-p" data-t="hero_p">Персональный 30-дневный план питания, созданный ИИ специально под тебя. Рецепты, список покупок и трекер калорий — всё в одном месте.</p>
+    <div class="hero-btns">
+      <button class="btn-hero" onclick="goApp('register')">🚀 <span data-t="cta_main">Получить мой план</span></button>
+      <button class="btn-hero-ghost" onclick="goApp('login')" data-t="cta_login">Войти</button>
+    </div>
+    <div class="hero-trust">
+      <div class="trust-avatars">
+        <div class="trust-avatar">M</div>
+        <div class="trust-avatar">A</div>
+        <div class="trust-avatar">S</div>
+        <div class="trust-avatar">+</div>
+      </div>
+      <div class="trust-text">
+        <strong data-t="trust_n">2,400+ пользователей</strong>
+        <span data-t="trust_s">⭐⭐⭐⭐⭐ 4.9 из 5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="ps-header">
+          <div class="ps-greeting" data-t="good_morning">Доброе утро!</div>
+          <div class="ps-name" id="ps-name-demo">Анна ✨</div>
+          <div class="ps-cal-row">
+            <div>
+              <div class="ps-cal-num">1,250</div>
+              <div class="ps-cal-of" data-t="ps_of">из 1,680 kcal</div>
+            </div>
+            <div class="ps-ring-wrap">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="6"/>
+                <circle cx="32" cy="32" r="26" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="163.4" stroke-dashoffset="60" stroke-linecap="round"/>
+              </svg>
+              <div class="ps-ring-center"><div class="ps-ring-pct">74%</div></div>
+            </div>
+          </div>
+          <div class="ps-macro-row">
+            <div class="ps-macro"><div class="ps-macro-lbl" data-t="prot">Белки</div><div class="ps-macro-bar"><div class="ps-macro-fill" style="width:70%;background:#22C55E"></div></div></div>
+            <div class="ps-macro"><div class="ps-macro-lbl" data-t="carb">Углеводы</div><div class="ps-macro-bar"><div class="ps-macro-fill" style="width:55%;background:#FFB800"></div></div></div>
+            <div class="ps-macro"><div class="ps-macro-lbl" data-t="fat">Жиры</div><div class="ps-macro-bar"><div class="ps-macro-fill" style="width:40%;background:#4C8DFF"></div></div></div>
+          </div>
+        </div>
+        <div class="ps-meals">
+          <div class="ps-meal"><div class="ps-meal-icon" style="background:#F0FDF4">🥣</div><div class="ps-meal-name" data-t="m1">Овсянка с ягодами</div><div class="ps-meal-kcal">380</div></div>
+          <div class="ps-meal"><div class="ps-meal-icon" style="background:#E8F8F2">🍗</div><div class="ps-meal-name" data-t="m2">Курица с овощами</div><div class="ps-meal-kcal">520</div></div>
+          <div class="ps-meal"><div class="ps-meal-icon" style="background:#EBF2FF">🥗</div><div class="ps-meal-name" data-t="m3">Греческий салат</div><div class="ps-meal-kcal">280</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="float-card fc-1"><div class="fc-icon">🔥</div><div><div class="fc-label" data-t="fc1_l">Калории сегодня</div><div class="fc-val">1,250 kcal</div></div></div>
+    <div class="float-card fc-2"><div class="fc-icon">📅</div><div><div class="fc-label" data-t="fc2_l">День плана</div><div class="fc-val">14 / 30</div></div></div>
+    <div class="float-card fc-3"><div class="fc-icon">🛒</div><div><div class="fc-label" data-t="fc3_l">Список покупок</div><div class="fc-val" data-t="fc3_v">Готов</div></div></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-strip-inner">
+    <div class="stat-item"><div class="stat-num">6€</div><div class="stat-lbl" data-t="stat1">в месяц за персональный план питания</div></div>
+    <div class="stat-item"><div class="stat-num">30</div><div class="stat-lbl" data-t="stat2">дней блюд с полными рецептами</div></div>
+    <div class="stat-item"><div class="stat-num">ИИ</div><div class="stat-lbl" data-t="stat3">анализирует данные и создаёт уникальный план</div></div>
+    <div class="stat-item"><div class="stat-num">7</div><div class="stat-lbl" data-t="stat4">дней бесплатного периода</div></div>
+  </div>
+</div>
+
+<!-- HOW -->
+<section class="how">
+  <div class="section-eyebrow" data-t="how_label">Как это работает</div>
+  <div class="section-h" data-t="how_h">Три шага до результата</div>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">01</div><div class="how-icon">📋</div><div class="how-title" data-t="how1_t">Расскажи о себе</div><div class="how-txt" data-t="how1_p">Заполни анкету: цель, параметры, аллергии, предпочтения, бюджет на еду. Занимает 3 минуты.</div></div>
+    <div class="how-card"><div class="how-num">02</div><div class="how-icon">🤖</div><div class="how-title" data-t="how2_t">ИИ создаёт план</div><div class="how-txt" data-t="how2_p">Получаешь 30-дневный план с рецептами и списком покупок. Новый план каждый месяц.</div></div>
+    <div class="how-card"><div class="how-num">03</div><div class="how-icon">📊</div><div class="how-title" data-t="how3_t">Следи и достигай</div><div class="how-txt" data-t="how3_p">Записывай что ел, считай калории, получай советы ИИ. Видишь прогресс каждый день.</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon-wrap">🍽️</div><div><div class="feature-title" data-t="f1_t">Персональный план</div><div class="feature-txt" data-t="f1_p">ИИ учитывает твои данные, аллергии и вкусы. Никаких шаблонных диет — только твой план.</div></div></div>
+    <div class="feature-card"><div class="feature-icon-wrap">📖</div><div><div class="feature-title" data-t="f2_t">Рецепты на каждое блюдо</div><div class="feature-txt" data-t="f2_p">Полный рецепт с ингредиентами, граммовками и пошаговой инструкцией. Нажми — получи.</div></div></div>
+    <div class="feature-card"><div class="feature-icon-wrap">🛒</div><div><div class="feature-title" data-t="f3_t">Список покупок</div><div class="feature-txt" data-t="f3_p">ИИ автоматически составляет список покупок на неделю. Отмечай купленное прямо в приложении.</div></div></div>
+    <div class="feature-card"><div class="feature-icon-wrap">🔥</div><div><div class="feature-title" data-t="f4_t">Трекер калорий с советами</div><div class="feature-txt" data-t="f4_p">Записывай блюда, считай КБЖУ. ИИ подсказывает что съесть до конца дня чтобы вписаться в норму.</div></div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <div class="section-eyebrow" data-t="pricing_label">Цена</div>
+      <div class="section-h" data-t="pricing_h">Просто и честно</div>
+    </div>
+    <div class="pricing-card">
+      <div>
+        <div class="price-num"><sup>€</sup>6</div>
+        <div class="price-per" data-t="price_per">/месяц</div>
+        <div class="price-free"><span class="price-free-txt" data-t="price_free">🎁 7 дней бесплатно</span></div>
+        <button class="price-cta" onclick="goApp('register')" data-t="price_cta">Начать бесплатно →</button>
+        <span class="price-demo" onclick="goApp('login')" data-t="price_demo">Уже есть аккаунт? Войти</span>
+      </div>
+      <ul class="perks-list">
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk1">30-дневный ИИ план питания</span></li>
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk2">Полные рецепты на каждое блюдо</span></li>
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk3">Список покупок на каждую неделю</span></li>
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk4">Трекер калорий и КБЖУ</span></li>
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk5">Ежедневные советы от ИИ</span></li>
+        <li class="perk"><div class="perk-check">✓</div><span data-t="perk6">Новый план каждый месяц</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Easy<span>Life</span></div>
+  <div class="footer-txt" data-t="footer">© 2026 EasyLife · Умное питание с ИИ</div>
+</footer>
+
+<script>
+const T = {
+  ru: { nav_login:'Войти', nav_cta:'Начать бесплатно', tag:'ИИ-нутрициолог', h1:'Твой ежедневный гид\nк умному питанию', hero_p:'Персональный 30-дневный план питания, созданный ИИ специально под тебя. Рецепты, список покупок и трекер калорий — всё в одном месте.', cta_main:'Получить мой план', cta_login:'Войти', trust_n:'2,400+ пользователей', trust_s:'⭐⭐⭐⭐⭐ 4.9 из 5', good_morning:'Доброе утро!', ps_of:'из 1,680 kcal', prot:'Белки', carb:'Углеводы', fat:'Жиры', m1:'Овсянка с ягодами', m2:'Курица с овощами', m3:'Греческий салат', fc1_l:'Калории сегодня', fc2_l:'День плана', fc3_l:'Список покупок', fc3_v:'Готов', stat1:'в месяц за персональный план питания', stat2:'дней блюд с полными рецептами', stat3:'анализирует данные и создаёт уникальный план', stat4:'дней бесплатного периода', how_label:'Как это работает', how_h:'Три шага до результата', how1_t:'Расскажи о себе', how1_p:'Заполни анкету: цель, параметры, аллергии, предпочтения, бюджет на еду. Занимает 3 минуты.', how2_t:'ИИ создаёт план', how2_p:'Получаешь 30-дневный план с рецептами и списком покупок. Новый план каждый месяц.', how3_t:'Следи и достигай', how3_p:'Записывай что ел, считай калории, получай советы ИИ. Видишь прогресс каждый день.', f1_t:'Персональный план', f1_p:'ИИ учитывает твои данные, аллергии и вкусы. Никаких шаблонных диет — только твой план.', f2_t:'Рецепты на каждое блюдо', f2_p:'Полный рецепт с ингредиентами, граммовками и пошаговой инструкцией. Нажми — получи.', f3_t:'Список покупок', f3_p:'ИИ автоматически составляет список покупок на неделю. Отмечай купленное прямо в приложении.', f4_t:'Трекер калорий с советами', f4_p:'Записывай блюда, считай КБЖУ. ИИ подсказывает что съесть до конца дня чтобы вписаться в норму.', pricing_label:'Цена', pricing_h:'Просто и честно', price_per:'/месяц', price_free:'🎁 7 дней бесплатно', price_cta:'Начать бесплатно →', price_demo:'Уже есть аккаунт? Войти', perk1:'30-дневный ИИ план питания', perk2:'Полные рецепты на каждое блюдо', perk3:'Список покупок на каждую неделю', perk4:'Трекер калорий и КБЖУ', perk5:'Ежедневные советы от ИИ', perk6:'Новый план каждый месяц', footer:'© 2026 EasyLife · Умное питание с ИИ' },
+  en: { nav_login:'Sign In', nav_cta:'Start free', tag:'AI Nutritionist', h1:'Your daily guide\nto smarter eating', hero_p:'A personal 30-day meal plan created by AI especially for you. Recipes, shopping list and calorie tracker — all in one place.', cta_main:'Get my plan', cta_login:'Sign In', trust_n:'2,400+ users', trust_s:'⭐⭐⭐⭐⭐ 4.9 / 5', good_morning:'Good morning!', ps_of:'of 1,680 kcal', prot:'Protein', carb:'Carbs', fat:'Fat', m1:'Oatmeal with berries', m2:'Chicken with vegetables', m3:'Greek salad', fc1_l:'Calories today', fc2_l:'Plan day', fc3_l:'Shopping list', fc3_v:'Ready', stat1:'per month for a personal meal plan', stat2:'days of meals with full recipes', stat3:'AI analyses data and creates a unique plan', stat4:'days free trial', how_label:'How it works', how_h:'Three steps to results', how1_t:'Tell us about yourself', how1_p:'Fill out a 3-minute questionnaire: goal, measurements, allergies, preferences and food budget.', how2_t:'AI creates your plan', how2_p:'Get a 30-day plan with recipes and a shopping list. A new plan every month.', how3_t:'Track and achieve', how3_p:'Log meals, count calories, get AI tips. See your progress every day.', f1_t:'Personal plan', f1_p:'AI considers your data, allergies and tastes. No template diets — only your plan.', f2_t:'Recipes for every dish', f2_p:'Full recipe with ingredients, grams and step-by-step instructions. Tap — get it.', f3_t:'Shopping list', f3_p:'AI automatically builds a weekly shopping list. Check off purchases right in the app.', f4_t:'Calorie tracker with tips', f4_p:'Log meals, track macros. AI suggests what to eat for the rest of the day to stay on target.', pricing_label:'Pricing', pricing_h:'Simple and honest', price_per:'/month', price_free:'🎁 7 days free', price_cta:'Start for free →', price_demo:'Already have an account? Sign in', perk1:'30-day AI meal plan', perk2:'Full recipes for every dish', perk3:'Weekly shopping list', perk4:'Calorie & macro tracker', perk5:'Daily AI tips', perk6:'New plan every month', footer:'© 2026 EasyLife · Smart nutrition with AI' },
+  es: { nav_login:'Entrar', nav_cta:'Empezar gratis', tag:'Nutricionista IA', h1:'Tu guía diaria\nde alimentación inteligente', hero_p:'Un plan de comidas personal de 30 días creado por IA especialmente para ti.', cta_main:'Obtener mi plan', cta_login:'Entrar', trust_n:'2,400+ usuarios', trust_s:'⭐⭐⭐⭐⭐ 4.9 / 5', good_morning:'¡Buenos días!', ps_of:'de 1,680 kcal', prot:'Proteínas', carb:'Carbos', fat:'Grasas', m1:'Avena con bayas', m2:'Pollo con verduras', m3:'Ensalada griega', fc1_l:'Calorías hoy', fc2_l:'Día del plan', fc3_l:'Lista de compras', fc3_v:'Lista', stat1:'al mes por un plan personalizado', stat2:'días de comidas con recetas', stat3:'IA analiza datos y crea tu plan', stat4:'días de prueba gratis', how_label:'Cómo funciona', how_h:'Tres pasos al resultado', how1_t:'Cuéntanos sobre ti', how1_p:'Rellena el cuestionario: objetivo, medidas, alergias y preferencias. 3 minutos.', how2_t:'La IA crea tu plan', how2_p:'Obtienes un plan de 30 días con recetas y lista de compras. Plan nuevo cada mes.', how3_t:'Sigue y logra', how3_p:'Registra comidas, cuenta calorías, recibe consejos de IA.', f1_t:'Plan personal', f1_p:'La IA considera tus datos, alergias y gustos. Nada de dietas genéricas.', f2_t:'Recetas para cada plato', f2_p:'Receta completa con ingredientes e instrucciones paso a paso.', f3_t:'Lista de compras', f3_p:'La IA genera automáticamente una lista de compras semanal.', f4_t:'Contador de calorías', f4_p:'Registra comidas, rastrea macros. La IA sugiere qué comer el resto del día.', pricing_label:'Precio', pricing_h:'Simple y honesto', price_per:'/mes', price_free:'🎁 7 días gratis', price_cta:'Empezar gratis →', price_demo:'¿Ya tienes cuenta? Entrar', perk1:'Plan IA de 30 días', perk2:'Recetas completas', perk3:'Lista de compras semanal', perk4:'Seguimiento de calorías', perk5:'Consejos diarios de IA', perk6:'Plan nuevo cada mes', footer:'© 2026 EasyLife · Nutrición inteligente con IA' }
+};
+
+let lang = 'ru';
+
+function t(k) { return (T[lang] && T[lang][k]) || T.ru[k] || k; }
+
+function setLang(l, el) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyT();
+}
+
+function applyT() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.getAttribute('data-t');
+    const v = t(k);
+    if (v && el.tagName !== 'INPUT') el.textContent = v;
+  });
+}
+
+// Navigate to app with intent
+function goApp(intent) {
+  // Store intent so app.html knows what to show first
+  sessionStorage.setItem('intent', intent);
+  sessionStorage.setItem('lang', lang);
+  window.location.href = 'app.html';
+}
+
+applyT();
+</script>
+</body>
+</html>

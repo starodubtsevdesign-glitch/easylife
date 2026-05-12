@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyLife — Личный кабинет</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F4F6FA; --white:#FFFFFF; --dark:#111318; --text:#1A1D26; --muted:#8A90A2; --border:#E8EAF0;
+  --primary:#22C55E; --primary-d:#16A34A; --primary-l:#F0FDF4; --primary-m:#BBF7D0;
+  --teal:#2DBE8A; --teal-l:#E8F8F2;
+  --yellow:#FFB800; --yellow-l:#FFF8E0;
+  --blue:#4C8DFF; --blue-l:#EBF2FF;
+  --red:#EF4444;
+  --r:20px; --r-sm:14px; --r-xs:10px;
+  --sh:0 4px 24px rgba(0,0,0,.07); --sh-sm:0 2px 10px rgba(0,0,0,.05);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select{font-family:inherit;border:none;outline:none}
+
+/* ══ ROUTER — only one page visible at a time ══ */
+.page{display:none;min-height:100vh}
+.page.active{display:flex;flex-direction:column}
+
+/* ══════════ AUTH PAGE ══════════ */
+#page-auth{background:var(--bg);align-items:center;justify-content:center;padding:24px}
+
+.auth-shell{
+  background:var(--white);
+  border-radius:28px;
+  width:100%;max-width:460px;
+  box-shadow:var(--sh);
+  overflow:hidden;
+}
+.auth-top{
+  background:linear-gradient(135deg,var(--primary-d) 0%,var(--primary) 100%);
+  padding:36px 40px 32px;
+  position:relative;overflow:hidden;
+}
+.auth-top::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1)}
+.auth-logo{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#fff;margin-bottom:4px}
+.auth-logo span{color:rgba(255,255,255,.65);font-weight:400;font-size:15px;display:block;margin-top:2px}
+.auth-body{padding:32px 40px 36px}
+.auth-tabs{display:flex;background:var(--bg);border-radius:var(--r-sm);padding:4px;gap:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:11px;border-radius:var(--r-xs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--muted);transition:all .2s}
+.auth-tab.active{background:var(--white);color:var(--dark);box-shadow:var(--sh-sm)}
+.inp-wrap{position:relative;margin-bottom:12px}
+.inp-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;z-index:1}
+.inp{width:100%;padding:15px 16px 15px 46px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:15px;color:var(--dark);transition:all .2s}
+.inp:focus{border-color:var(--primary);background:var(--white)}
+.inp::placeholder{color:var(--muted)}
+.btn-auth{width:100%;padding:15px;background:var(--primary);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:#fff;box-shadow:0 6px 18px rgba(34,197,94,.3);transition:all .2s;margin-top:4px}
+.btn-auth:hover{background:var(--primary-d);transform:translateY(-1px)}
+.auth-divider{text-align:center;font-size:13px;color:var(--muted);margin:16px 0;position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.btn-google{width:100%;padding:14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--dark);display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color .2s}
+.btn-google:hover{border-color:var(--primary)}
+.auth-back-link{text-align:center;font-size:13px;color:var(--muted);margin-top:18px;cursor:pointer}
+.auth-back-link span{color:var(--primary);font-weight:700}
+.auth-error{background:#FFF2F2;border:1px solid #FECACA;border-radius:var(--r-xs);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:12px;display:none}
+.auth-error.show{display:block}
+
+/* ══════════ PAYMENT PAGE ══════════ */
+#page-payment{background:var(--bg);align-items:center;justify-content:center;padding:24px}
+.pay-shell{width:100%;max-width:520px}
+.pay-back{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--muted);margin-bottom:24px;cursor:pointer;width:fit-content}
+.pay-back:hover{color:var(--dark)}
+.pay-h{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.pay-sub{font-size:15px;color:var(--muted);margin-bottom:24px}
+.pay-card{background:var(--dark);border-radius:28px;padding:36px;margin-bottom:16px;position:relative;overflow:hidden}
+.pay-card::before{content:'';position:absolute;right:-50px;top:-50px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,.18) 0%,transparent 60%)}
+.pay-badge{display:inline-flex;align-items:center;gap:6px;background:var(--primary);border-radius:50px;padding:5px 14px;margin-bottom:18px}
+.pay-badge-txt{font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;text-transform:uppercase}
+.pay-price{font-family:'Nunito',sans-serif;font-size:60px;font-weight:900;color:#fff;line-height:1}
+.pay-price sup{font-size:26px;vertical-align:top;margin-top:12px;display:inline-block}
+.pay-price-sub{font-size:18px;color:rgba(255,255,255,.35)}
+.pay-perks{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:12px}
+.pay-perk{display:flex;align-items:center;gap:12px;font-size:14px;color:rgba(255,255,255,.7)}
+.pay-perk-check{width:22px;height:22px;border-radius:50%;background:rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--primary);flex-shrink:0}
+.pay-trial{background:var(--primary-l);border:1.5px dashed var(--primary-m);border-radius:var(--r-sm);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.btn-pay{width:100%;padding:16px;background:var(--primary);border-radius:50px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#fff;box-shadow:0 8px 22px rgba(34,197,94,.35);margin-bottom:10px;transition:all .2s}
+.btn-pay:hover{background:var(--primary-d);transform:translateY(-1px)}
+.pay-skip{display:block;text-align:center;font-size:13px;color:var(--muted);text-decoration:underline;cursor:pointer}
+
+/* ══════════ ONBOARDING PAGE ══════════ */
+#page-onboarding{background:var(--bg);align-items:center;justify-content:center;padding:24px 24px 40px}
+.onb-shell{width:100%;max-width:580px;background:var(--white);border-radius:28px;box-shadow:var(--sh);padding:36px 40px}
+.onb-header{display:flex;align-items:center;gap:16px;margin-bottom:36px}
+.onb-back-btn{width:40px;height:40px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);flex-shrink:0;transition:all .2s}
+.onb-back-btn:hover{background:var(--border)}
+.onb-progress-track{flex:1;height:6px;background:var(--bg);border-radius:4px;overflow:hidden}
+.onb-progress-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .4s ease}
+.onb-step-counter{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.onb-step{display:none}
+.onb-step.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.onb-eyebrow{font-size:12px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.onb-q{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:6px;line-height:1.2}
+.onb-hint{font-size:14px;color:var(--muted);margin-bottom:24px}
+.onb-opts{display:flex;flex-direction:column;gap:10px}
+.onb-opt{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--bg);border:2px solid transparent;border-radius:var(--r-sm);cursor:pointer;text-align:left;transition:all .18s}
+.onb-opt:hover{border-color:var(--primary-m);background:var(--primary-l)}
+.onb-opt.sel{border-color:var(--primary);background:var(--primary-l)}
+.onb-opt-icon{width:50px;height:50px;border-radius:var(--r-xs);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.onb-opt.sel .onb-opt-icon{background:rgba(34,197,94,.12)}
+.onb-opt-txt strong{font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--dark);display:block}
+.onb-opt-txt small{font-size:13px;color:var(--muted)}
+.onb-opt.sel .onb-opt-txt strong{color:var(--primary-d)}
+.onb-opt-check{margin-left:auto;width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .2s}
+.onb-opt.sel .onb-opt-check{background:var(--primary);border-color:var(--primary);color:#fff}
+.onb-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.onb-chip{padding:9px 18px;background:var(--bg);border:1.5px solid transparent;border-radius:50px;font-size:14px;font-weight:600;color:var(--dark);cursor:pointer;transition:all .2s}
+.onb-chip:hover{border-color:var(--primary-m)}
+.onb-chip.sel{background:var(--primary-l);border-color:var(--primary);color:var(--primary-d)}
+.onb-field-lbl{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.onb-inp{width:100%;padding:14px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:15px;color:var(--dark);transition:all .2s}
+.onb-inp:focus{border-color:var(--primary);background:var(--white)}
+.onb-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.onb-select{width:100%;padding:14px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:15px;color:var(--dark);appearance:none}
+.btn-onb-next{width:100%;margin-top:28px;padding:15px;background:var(--primary);border-radius:50px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#fff;box-shadow:0 6px 18px rgba(34,197,94,.3);transition:all .2s}
+.btn-onb-next:hover{background:var(--primary-d);transform:translateY(-1px)}
+.btn-onb-next.finish{background:linear-gradient(135deg,var(--primary-d),var(--primary))}
+
+/* ══════════ DASHBOARD ══════════ */
+#page-dashboard{background:var(--bg);flex-direction:row}
+
+/* Sidebar */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--dark);
+  display:flex;flex-direction:column;
+  padding:28px 0;
+  position:fixed;top:0;left:0;height:100vh;
+  z-index:200;
+  transition:transform .3s;
+}
+.sidebar-logo{font-family:'Nunito',sans-serif;font-size:21px;font-weight:900;color:#fff;padding:0 24px;margin-bottom:32px}
+.sidebar-logo span{color:var(--primary)}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:13px 24px;font-size:14px;font-weight:600;color:rgba(255,255,255,.4);cursor:pointer;border-left:3px solid transparent;transition:all .2s}
+.sidebar-item:hover{color:#fff;background:rgba(255,255,255,.05)}
+.sidebar-item.active{color:#fff;border-left-color:var(--primary);background:rgba(34,197,94,.08)}
+.sidebar-item-icon{font-size:18px}
+.sidebar-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,.07)}
+.sidebar-user-name{font-size:14px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:2px}
+.sidebar-user-sub{font-size:12px;color:rgba(34,197,94,.7)}
+.sidebar-logout{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.3);cursor:pointer;margin-top:12px;transition:color .2s}
+.sidebar-logout:hover{color:var(--red)}
+
+/* Main */
+.dash-main{flex:1;margin-left:240px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--white);padding:18px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;flex-shrink:0}
+.topbar-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-notif{width:40px;height:40px;background:var(--bg);border-radius:var(--r-xs);display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;position:relative}
+.notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--white)}
+.topbar-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary-d),var(--primary));display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:#fff;cursor:pointer}
+
+/* Dash pages */
+.dash-content{flex:1;overflow-y:auto}
+.dash-page{display:none;padding:28px 32px 80px}
+.dash-page.active{display:block;animation:fadeUp .25s ease}
+
+/* ── HOME ── */
+.cal-card{
+  background:var(--dark);border-radius:var(--r);padding:28px 32px;margin-bottom:20px;
+  display:flex;gap:32px;align-items:center;position:relative;overflow:hidden;
+}
+.cal-card::before{content:'';position:absolute;right:-50px;bottom:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,.18) 0%,transparent 60%)}
+.cal-ring-box{position:relative;width:120px;height:120px;flex-shrink:0}
+.cal-ring-box svg{transform:rotate(-90deg)}
+.cal-ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.cal-ring-pct{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1}
+.cal-ring-lbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.cal-info{flex:1}
+.cal-lbl{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.cal-num{font-family:'Nunito',sans-serif;font-size:52px;font-weight:900;color:#fff;line-height:1}
+.cal-target{font-size:15px;color:rgba(255,255,255,.3);margin-top:4px;margin-bottom:20px}
+.macro-strips{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.macro-strip-lbl{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:5px;font-weight:600}
+.macro-strip-track{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.macro-strip-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.macro-strip-val{font-size:12px;font-weight:700;color:#fff;margin-top:5px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.stat-card{background:var(--white);border-radius:var(--r);padding:22px 24px}
+.stat-card-ico{font-size:28px;margin-bottom:10px}
+.stat-card-lbl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.stat-card-val{font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;color:var(--dark);margin-top:4px;line-height:1}
+.stat-card-unit{font-size:14px;color:var(--muted)}
+
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:var(--dark)}
+.section-link{font-size:13px;font-weight:700;color:var(--primary);cursor:pointer}
+.section-link:hover{color:var(--primary-d)}
+
+.meal-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.meal-card{background:var(--white);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .2s}
+.meal-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
+.meal-card-img{height:120px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.meal-card-time{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);border-radius:50px;padding:3px 10px;font-size:11px;color:#fff;font-weight:600}
+.meal-card-body{padding:14px 16px}
+.meal-card-name{font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--dark);margin-bottom:6px}
+.meal-card-meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+.meal-card-kcal{color:var(--primary);font-weight:700}
+
+.ai-box{background:linear-gradient(135deg,#1A1D26,#2D3142);border-radius:var(--r);padding:24px 28px;display:flex;gap:20px;align-items:flex-start}
+.ai-box-icon{font-size:36px;flex-shrink:0}
+.ai-box-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.2);border-radius:50px;padding:4px 12px;margin-bottom:10px}
+.ai-box-badge-txt{font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.5px}
+.ai-box-text{font-size:14px;color:rgba(255,255,255,.75);line-height:1.65}
+.ai-box-btn{margin-top:12px;padding:9px 20px;background:var(--primary);border-radius:50px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#fff;transition:all .2s}
+.ai-box-btn:hover{background:var(--primary-d)}
+
+/* ── PLAN ── */
+.plan-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.week-pills{display:flex;gap:8px;flex-wrap:wrap}
+.week-pill{padding:9px 22px;border-radius:50px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--muted);transition:all .2s}
+.week-pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-shop{padding:10px 20px;background:var(--primary-l);border-radius:50px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--primary-d);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.btn-shop:hover{background:var(--primary);color:#fff}
+.phase-banner{background:var(--dark);border-radius:var(--r-sm);padding:16px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.phase-name{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff}
+.phase-desc{font-size:13px;color:rgba(255,255,255,.35);margin-top:2px}
+.phase-kcal{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--primary);text-align:right}
+.phase-kcal-lbl{font-size:11px;color:rgba(255,255,255,.3);text-align:right}
+.plan-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.plan-day{background:var(--white);border-radius:var(--r-sm);overflow:hidden;border-top:3px solid var(--border)}
+.plan-day.today{border-top-color:var(--primary)}
+.plan-day-head{padding:10px 12px;background:var(--bg);display:flex;justify-content:space-between;align-items:center}
+.plan-day-name{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.plan-today-badge{background:var(--primary);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:50px}
+.plan-day-kcal{font-size:10px;font-weight:700;color:var(--primary)}
+.plan-meal-slot{padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.plan-meal-slot:last-child{border:none}
+.plan-meal-slot:hover{background:var(--primary-l)}
+.plan-slot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:rgba(26,29,38,.28);margin-bottom:3px;font-weight:700}
+.plan-slot-val{font-size:11px;color:var(--dark);line-height:1.35;font-weight:600}
+.plan-slot-val:hover{color:var(--primary)}
+.plan-loading{padding:80px;text-align:center}
+.spin{font-size:32px;animation:spin 2s linear infinite;display:inline-block;color:var(--primary)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.plan-loading-txt{margin-top:14px;font-size:15px;color:var(--muted);font-weight:600}
+
+/* ── LOG ── */
+.log-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.log-summary{background:var(--dark);border-radius:var(--r);padding:28px}
+.log-cal-num{font-family:'Nunito',sans-serif;font-size:52px;font-weight:900;color:#fff;line-height:1}
+.log-cal-of{font-size:15px;color:rgba(255,255,255,.3);margin-top:4px;margin-bottom:18px}
+.log-track{height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin-bottom:20px}
+.log-track-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .5s ease}
+.log-macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.lm{background:rgba(255,255,255,.07);border-radius:var(--r-xs);padding:12px;text-align:center}
+.lm-val{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#fff}
+.lm-lbl{font-size:11px;color:rgba(255,255,255,.35);font-weight:700;margin-top:2px}
+.ai-sug{background:linear-gradient(135deg,var(--primary-d),var(--primary));border-radius:var(--r-sm);padding:20px}
+.ai-sug-lbl{font-size:10px;font-weight:800;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.ai-sug-text{font-size:14px;color:#fff;line-height:1.6}
+.ai-sug-btn{margin-top:12px;padding:9px 18px;background:rgba(255,255,255,.2);border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s}
+.ai-sug-btn:hover{background:rgba(255,255,255,.3)}
+.log-entries{background:var(--white);border-radius:var(--r);padding:24px}
+.log-entries-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn-add-meal{padding:9px 18px;background:var(--primary);border-radius:50px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.btn-add-meal:hover{background:var(--primary-d)}
+.log-form{background:var(--bg);border-radius:var(--r-sm);padding:16px;margin-bottom:16px;display:none}
+.log-form.open{display:block;animation:fadeUp .2s ease}
+.log-form-row{display:flex;gap:8px}
+.log-inp{padding:12px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-xs);font-size:14px;color:var(--dark);flex:1;transition:border-color .2s}
+.log-inp:focus{border-color:var(--primary)}
+.log-inp-sm{max-width:110px;flex:none}
+.log-form-btns{display:flex;gap:8px;margin-top:10px}
+.log-save-btn{flex:1;padding:11px;background:var(--primary);border-radius:var(--r-xs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer}
+.log-cancel-btn{padding:11px 18px;background:var(--border);border-radius:var(--r-xs);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
+.log-entry{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.log-entry:last-child{border:none}
+.log-entry-emoji{width:46px;height:46px;background:var(--bg);border-radius:var(--r-xs);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.log-entry-name{font-size:14px;font-weight:700;color:var(--dark);flex:1}
+.log-entry-kcal{font-size:15px;font-weight:800;color:var(--primary)}
+.log-del{color:rgba(138,144,162,.4);font-size:16px;cursor:pointer;margin-left:8px;transition:color .2s}
+.log-del:hover{color:var(--red)}
+.log-empty{padding:30px;text-align:center;font-size:14px;color:var(--muted)}
+
+/* ── PROFILE ── */
+.profile-hero{background:linear-gradient(135deg,#14532D 0%,var(--primary) 100%);border-radius:var(--r);padding:32px;margin-bottom:20px;display:flex;align-items:center;gap:24px;position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;right:-30px;top:-30px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1)}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.25);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;color:#fff;flex-shrink:0}
+.profile-name{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#fff}
+.profile-email{font-size:14px;color:rgba(255,255,255,.6);margin-top:3px}
+.profile-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border-radius:50px;padding:5px 14px;margin-top:10px;font-size:13px;font-weight:700;color:#fff}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.ps{background:var(--white);border-radius:var(--r);padding:20px;text-align:center}
+.ps-val{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--dark)}
+.ps-lbl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.profile-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.profile-info-card{background:var(--white);border-radius:var(--r);padding:22px}
+.pic-title{font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:var(--dark);margin-bottom:14px}
+.pic-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px}
+.pic-row:last-child{border:none}
+.pic-row-left{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.pic-val{font-weight:700;color:var(--primary-d)}
+
+/* ══ MODALS ══ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(17,19,24,.55);z-index:8000;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:20px}
+.modal-bg.open{display:flex;animation:fadeUp .2s ease}
+.modal-box{background:var(--white);border-radius:28px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.2);animation:scaleIn .25s ease}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-header{padding:22px 28px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.modal-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark);flex:1;padding-right:16px}
+.modal-chips{display:flex;gap:6px;margin-top:5px}
+.modal-chip{background:var(--bg);border-radius:50px;padding:3px 10px;font-size:12px;font-weight:700;color:var(--muted)}
+.modal-close{width:34px;height:34px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);cursor:pointer;flex-shrink:0}
+.modal-close:hover{background:var(--border)}
+.modal-body{overflow-y:auto;flex:1;padding:20px 28px}
+.nut-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.nut-chip{background:var(--bg);border-radius:var(--r-xs);padding:14px;text-align:center}
+.nut-val{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark)}
+.nut-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.recipe-cols{display:grid;grid-template-columns:1fr 1.6fr;gap:28px}
+.modal-section-title{font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:var(--dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.ing-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.ing-row:last-child{border:none}
+.ing-qty{font-weight:700;color:var(--primary)}
+.step-row{display:flex;gap:14px;padding:10px 0}
+.step-badge{width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.step-body{font-size:14px;color:var(--dark);line-height:1.65;padding-top:4px}
+.chef-tip-box{background:var(--primary-l);border-radius:var(--r-sm);padding:14px 16px;margin-top:16px;border-left:3px solid var(--primary)}
+.chef-tip-lbl{font-size:11px;font-weight:800;color:var(--primary-d);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.chef-tip-body{font-size:14px;color:var(--dark);line-height:1.6}
+.modal-footer{padding:14px 28px 20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0}
+.modal-btn-main{flex:1;padding:14px;background:var(--primary);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(34,197,94,.3);transition:all .2s}
+.modal-btn-main:hover{background:var(--primary-d)}
+.modal-btn-sec{padding:14px 22px;background:var(--bg);border-radius:var(--r-sm);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--muted);cursor:pointer}
+.modal-loading{padding:60px;text-align:center}
+.modal-loading-txt{margin-top:12px;font-size:14px;color:var(--muted);font-weight:600}
+
+/* Shop modal */
+.shop-modal-box{max-width:520px}
+.shop-cat-head{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
+.shop-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.shop-item:last-child{border:none}
+.shop-checkbox{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;transition:all .2s}
+.shop-item.checked .shop-checkbox{background:var(--primary);border-color:var(--primary);color:#fff}
+.shop-item.checked .shop-item-name{text-decoration:line-through;color:var(--muted)}
+.shop-item-name{font-size:14px;font-weight:600;color:var(--dark);flex:1}
+.shop-item-qty{font-size:13px;font-weight:700;color:var(--primary)}
+.shop-footer-row{display:flex;justify-content:space-between;align-items:center;width:100%}
+.shop-prog-txt{font-size:13px;font-weight:700;color:var(--muted)}
+
+/* Mobile bottom nav */
+.mobile-nav{display:none}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1024px){
+  .meal-cards{grid-template-columns:1fr 1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .log-grid{grid-template-columns:1fr}
+  .profile-cards{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:repeat(4,1fr)}
+  .recipe-cols{grid-template-columns:1fr}
+  .nut-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  /* Auth */
+  #page-auth{padding:16px;align-items:flex-start;padding-top:50px}
+  .auth-shell{border-radius:20px}
+  .auth-top{padding:28px 24px}
+  .auth-body{padding:24px 24px 28px}
+  /* Payment */
+  #page-payment{padding:16px;align-items:flex-start;padding-top:50px}
+  .pay-card{padding:24px 20px}
+  /* Onboarding */
+  #page-onboarding{padding:16px 16px 40px}
+  .onb-shell{padding:24px 20px;border-radius:20px}
+  .onb-grid2{grid-template-columns:1fr}
+  /* Dashboard */
+  .sidebar{display:none}
+  .dash-main{margin-left:0}
+  .topbar{padding:14px 16px}
+  .dash-page{padding:16px 16px 90px}
+  .cal-card{flex-direction:column;align-items:flex-start}
+  .cal-num{font-size:40px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .meal-cards{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:1fr}
+  .log-grid{grid-template-columns:1fr}
+  .profile-stats{grid-template-columns:repeat(3,1fr)}
+  .profile-cards{grid-template-columns:1fr}
+  /* Modals */
+  .modal-bg{padding:0;align-items:flex-end}
+  .modal-box{border-radius:28px 28px 0 0;max-height:92vh}
+  .shop-modal-box{border-radius:28px 28px 0 0;max-width:100%}
+  .recipe-cols{grid-template-columns:1fr}
+  .nut-grid{grid-template-columns:repeat(2,1fr)}
+  /* Mobile nav */
+  .mobile-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--white);border-top:1px solid var(--border);
+    padding:10px 0 calc(10px + env(safe-area-inset-bottom));
+    z-index:500;justify-content:space-around;align-items:center;
+  }
+  .mob-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 14px}
+  .mob-nav-item.active .mob-icon{color:var(--primary)}
+  .mob-nav-item.active .mob-lbl{color:var(--primary);font-weight:800}
+  .mob-icon{font-size:22px;color:#C0C6D4;transition:color .2s}
+  .mob-lbl{font-size:10px;font-weight:700;color:#C0C6D4;letter-spacing:.3px;transition:color .2s}
+  .mob-center{width:52px;height:52px;background:var(--primary);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 6px 16px rgba(34,197,94,.4);margin-top:-14px}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr}
+  .profile-stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ RECIPE MODAL ══════════════════ -->
+<div class="modal-bg" id="modal-recipe" onclick="closeModal('modal-recipe',event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div><div class="modal-title" id="rm-title">—</div><div class="modal-chips" id="rm-chips"></div></div>
+      <button class="modal-close" onclick="closeModal('modal-recipe')">✕</button>
+    </div>
+    <div class="modal-body" id="rm-body">
+      <div class="modal-loading"><div class="spin">✦</div><div class="modal-loading-txt" id="rm-load-txt">—</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-main" onclick="addRecipeToDiary()" data-t="add_to_diary">+ В дневник питания</button>
+      <button class="modal-btn-sec" onclick="closeModal('modal-recipe')" data-t="close">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SHOPPING MODAL ══════════════════ -->
+<div class="modal-bg" id="modal-shop" onclick="closeModal('modal-shop',event)">
+  <div class="modal-box shop-modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div><div class="modal-title" id="sm-title">🛒</div><div style="font-size:13px;color:var(--muted);margin-top:4px" id="sm-sub">—</div></div>
+      <button class="modal-close" onclick="closeModal('modal-shop')">✕</button>
+    </div>
+    <div class="modal-body" id="sm-body">
+      <div class="modal-loading"><div class="spin">✦</div><div class="modal-loading-txt" id="sm-load-txt">—</div></div>
+    </div>
+    <div class="modal-footer">
+      <div class="shop-footer-row">
+        <button class="modal-btn-main" onclick="copyShop()" id="sm-copy-btn" data-t="copy_list" style="max-width:200px">📋 Скопировать</button>
+        <div class="shop-prog-txt" id="sm-prog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: AUTH
+══════════════════════════════════════════ -->
+<div class="page active" id="page-auth">
+  <div class="auth-shell">
+    <div class="auth-top">
+      <div class="auth-logo">EasyLife <span data-t="auth_sub">Личный кабинет</span></div>
+    </div>
+    <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login-btn" onclick="switchAuthTab('login')" data-t="tab_login">Войти</button>
+        <button class="auth-tab" id="tab-reg-btn" onclick="switchAuthTab('register')" data-t="tab_reg">Регистрация</button>
+      </div>
+      <div class="auth-error" id="auth-error" data-t="auth_error_txt">Проверьте введённые данные</div>
+
+      <!-- Login -->
+      <div id="auth-login-form">
+        <div class="inp-wrap"><span class="inp-icon">📧</span><input class="inp" type="email" id="login-email" data-ph="ph_email" placeholder="Email"/></div>
+        <div class="inp-wrap"><span class="inp-icon">🔒</span><input class="inp" type="password" id="login-pass" data-ph="ph_pass" placeholder="Пароль"/></div>
+        <button class="btn-auth" onclick="doLogin()" data-t="btn_login">Войти</button>
+      </div>
+
+      <!-- Register -->
+      <div id="auth-reg-form" style="display:none">
+        <div class="inp-wrap"><span class="inp-icon">👤</span><input class="inp" type="text" id="reg-name" data-ph="ph_name" placeholder="Имя"/></div>
+        <div class="inp-wrap"><span class="inp-icon">📧</span><input class="inp" type="email" id="reg-email" data-ph="ph_email" placeholder="Email"/></div>
+        <div class="inp-wrap"><span class="inp-icon">🔒</span><input class="inp" type="password" id="reg-pass" data-ph="ph_newpass" placeholder="Пароль (мин. 6 символов)"/></div>
+        <button class="btn-auth" onclick="doRegister()" data-t="btn_reg">Создать аккаунт</button>
+      </div>
+
+      <div class="auth-divider" data-t="or">или</div>
+      <button class="btn-google">🌐 <span data-t="google_btn">Войти через Google</span></button>
+      <div class="auth-back-link" onclick="goLanding()">← <span data-t="back_site">Вернуться на сайт</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: PAYMENT
+══════════════════════════════════════════ -->
+<div class="page" id="page-payment">
+  <div class="pay-shell">
+    <div class="pay-back" onclick="goto('auth')">← <span data-t="back">Назад</span></div>
+    <div class="pay-h" data-t="pay_h">Выбери подписку</div>
+    <div class="pay-sub" data-t="pay_sub">Полная персонализация под тебя</div>
+    <div class="pay-card">
+      <div class="pay-badge"><span class="pay-badge-txt" data-t="popular">Популярный</span></div>
+      <div class="pay-price"><sup>€</sup>6<span class="pay-price-sub">/мес</span></div>
+      <ul class="pay-perks">
+        <li class="pay-perk"><div class="pay-perk-check">✓</div><span data-t="perk1">30-дневный ИИ план питания</span></li>
+        <li class="pay-perk"><div class="pay-perk-check">✓</div><span data-t="perk2">Полные рецепты на каждое блюдо</span></li>
+        <li class="pay-perk"><div class="pay-perk-check">✓</div><span data-t="perk3">Список покупок на каждую неделю</span></li>
+        <li class="pay-perk"><div class="pay-perk-check">✓</div><span data-t="perk4">Трекер калорий и советы ИИ</span></li>
+        <li class="pay-perk"><div class="pay-perk-check">✓</div><span data-t="perk5">Новый план каждый месяц</span></li>
+      </ul>
+    </div>
+    <div class="pay-trial"><span style="font-size:22px">🎁</span><span style="font-size:14px;font-weight:700;color:var(--primary-d)" data-t="trial">7 дней бесплатно — начни прямо сейчас</span></div>
+    <button class="btn-pay" onclick="doPay()" data-t="pay_cta">Начать бесплатный период →</button>
+    <button class="pay-skip" onclick="doPay()" data-t="pay_demo">Продолжить без оплаты (демо)</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: ONBOARDING
+══════════════════════════════════════════ -->
+<div class="page" id="page-onboarding">
+  <div class="onb-shell">
+    <div class="onb-header">
+      <button class="onb-back-btn" onclick="onbBack()">←</button>
+      <div class="onb-progress-track"><div class="onb-progress-fill" id="onb-fill" style="width:12.5%"></div></div>
+      <div class="onb-step-counter" id="onb-counter">1 / 8</div>
+    </div>
+
+    <!-- Step 1: Goal -->
+    <div class="onb-step active" id="os1">
+      <div class="onb-eyebrow" data-t="step">Шаг 1 из 8</div>
+      <div class="onb-q" data-t="q_goal">Какова твоя цель?</div>
+      <div class="onb-hint" data-t="q_goal_h">Выбери главное — ИИ подстроит всё остальное</div>
+      <div class="onb-opts">
+        <button class="onb-opt" onclick="pick(this,'goal','lose')"><div class="onb-opt-icon">🔥</div><div class="onb-opt-txt"><strong data-t="g_lose">Похудеть</strong><small data-t="g_lose_s">Снизить вес и жир</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'goal','gain')"><div class="onb-opt-icon">💪</div><div class="onb-opt-txt"><strong data-t="g_gain">Набрать массу</strong><small data-t="g_gain_s">Нарастить мышцы</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'goal','maintain')"><div class="onb-opt-icon">⚖️</div><div class="onb-opt-txt"><strong data-t="g_maint">Поддержать вес</strong><small data-t="g_maint_s">Держать текущую форму</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'goal','health')"><div class="onb-opt-icon">🌿</div><div class="onb-opt-txt"><strong data-t="g_health">Питаться здоровее</strong><small data-t="g_health_s">Улучшить самочувствие</small></div><div class="onb-opt-check">✓</div></button>
+      </div>
+      <button class="btn-onb-next" onclick="onbGo(2)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 2: Body -->
+    <div class="onb-step" id="os2">
+      <div class="onb-eyebrow">Шаг 2 из 8</div>
+      <div class="onb-q" data-t="q_body">Твои параметры</div>
+      <div class="onb-hint" data-t="q_body_h">Рассчитаем персональную норму калорий</div>
+      <div class="onb-grid2" style="margin-bottom:14px">
+        <div><div class="onb-field-lbl" data-t="l_age">Возраст</div><input class="onb-inp" type="number" id="p-age" placeholder="28" min="14" max="90"/></div>
+        <div><div class="onb-field-lbl" data-t="l_sex">Пол</div><select class="onb-select onb-inp" id="p-sex"><option value="female" data-t="female">Женский</option><option value="male" data-t="male">Мужской</option></select></div>
+        <div><div class="onb-field-lbl" data-t="l_height">Рост, см</div><input class="onb-inp" type="number" id="p-height" placeholder="168"/></div>
+        <div><div class="onb-field-lbl" data-t="l_weight">Вес, кг</div><input class="onb-inp" type="number" id="p-weight" placeholder="68"/></div>
+      </div>
+      <div class="onb-field-lbl" data-t="l_target">Желаемый вес, кг (необязательно)</div>
+      <input class="onb-inp" type="number" id="p-target" placeholder="62"/>
+      <button class="btn-onb-next" onclick="onbGo(3)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 3: Activity -->
+    <div class="onb-step" id="os3">
+      <div class="onb-eyebrow">Шаг 3 из 8</div>
+      <div class="onb-q" data-t="q_act">Уровень активности</div>
+      <div class="onb-hint" data-t="q_act_h">Влияет на суточную норму калорий</div>
+      <div class="onb-opts">
+        <button class="onb-opt" onclick="pick(this,'activity','sedentary')"><div class="onb-opt-icon">🪑</div><div class="onb-opt-txt"><strong data-t="a_sed">Сидячий</strong><small data-t="a_sed_s">Офис, мало движения</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'activity','light')"><div class="onb-opt-icon">🚶</div><div class="onb-opt-txt"><strong data-t="a_light">Лёгкая</strong><small data-t="a_light_s">1-2 тренировки в неделю</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'activity','moderate')"><div class="onb-opt-icon">🏃</div><div class="onb-opt-txt"><strong data-t="a_mod">Умеренная</strong><small data-t="a_mod_s">3-4 тренировки в неделю</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'activity','high')"><div class="onb-opt-icon">🏋️</div><div class="onb-opt-txt"><strong data-t="a_high">Высокая</strong><small data-t="a_high_s">5+ тренировок</small></div><div class="onb-opt-check">✓</div></button>
+      </div>
+      <button class="btn-onb-next" onclick="onbGo(4)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 4: Diet -->
+    <div class="onb-step" id="os4">
+      <div class="onb-eyebrow">Шаг 4 из 8</div>
+      <div class="onb-q" data-t="q_diet">Тип питания</div>
+      <div class="onb-hint" data-t="q_diet_h">Это база для твоего плана</div>
+      <div class="onb-opts">
+        <button class="onb-opt" onclick="pick(this,'diet','standard')"><div class="onb-opt-icon">🍽️</div><div class="onb-opt-txt"><strong data-t="d_std">Обычное</strong><small data-t="d_std_s">Ем всё, европейская кухня</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'diet','vegetarian')"><div class="onb-opt-icon">🥦</div><div class="onb-opt-txt"><strong data-t="d_veg">Вегетарианское</strong><small data-t="d_veg_s">Без мяса и рыбы</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'diet','vegan')"><div class="onb-opt-icon">🌱</div><div class="onb-opt-txt"><strong data-t="d_vegan">Веганское</strong><small data-t="d_vegan_s">Только растительное</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'diet','keto')"><div class="onb-opt-icon">🥑</div><div class="onb-opt-txt"><strong data-t="d_keto">Кето</strong><small data-t="d_keto_s">Низкоуглеводное</small></div><div class="onb-opt-check">✓</div></button>
+      </div>
+      <button class="btn-onb-next" onclick="onbGo(5)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 5: Allergies -->
+    <div class="onb-step" id="os5">
+      <div class="onb-eyebrow">Шаг 5 из 8</div>
+      <div class="onb-q" data-t="q_allergy">Аллергии и непереносимость</div>
+      <div class="onb-hint" data-t="q_allergy_h">Исключим из всех блюд</div>
+      <div class="onb-tags">
+        <div class="onb-chip" onclick="chip(this,'allergy','gluten')" data-t="all_gluten">🌾 Глютен</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','lactose')" data-t="all_lactose">🥛 Лактоза</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','nuts')" data-t="all_nuts">🥜 Орехи</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','eggs')" data-t="all_eggs">🥚 Яйца</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','seafood')" data-t="all_seafood">🦐 Морепродукты</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','soy')" data-t="all_soy">🫘 Соя</div>
+        <div class="onb-chip" onclick="chip(this,'allergy','none')" data-t="all_none">✅ Нет аллергий</div>
+      </div>
+      <div class="onb-field-lbl" style="margin-top:16px" data-t="cond_lbl">Заболевания (необязательно)</div>
+      <input class="onb-inp" id="p-conditions" data-ph="ph_cond" placeholder="Диабет, ГЭРБ..."/>
+      <button class="btn-onb-next" onclick="onbGo(6)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 6: Prefs -->
+    <div class="onb-step" id="os6">
+      <div class="onb-eyebrow">Шаг 6 из 8</div>
+      <div class="onb-q" data-t="q_prefs">Что любишь есть?</div>
+      <div class="onb-hint" data-t="q_prefs_h">Выбери всё что нравится</div>
+      <div class="onb-tags">
+        <div class="onb-chip" onclick="chip(this,'prefs','chicken')" data-t="p_chicken">🍗 Курица</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','beef')" data-t="p_beef">🥩 Говядина</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','fish')" data-t="p_fish">🐟 Рыба</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','eggs')" data-t="p_eggs">🥚 Яйца</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','pasta')" data-t="p_pasta">🍝 Паста</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','rice')" data-t="p_rice">🍚 Рис</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','salads')" data-t="p_salads">🥗 Салаты</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','soup')" data-t="p_soup">🍲 Супы</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','dairy')" data-t="p_dairy">🧀 Молочное</div>
+        <div class="onb-chip" onclick="chip(this,'prefs','sweets')" data-t="p_sweets">🍫 Сладкое</div>
+      </div>
+      <div class="onb-field-lbl" style="margin-top:16px" data-t="dislikes_lbl">Не ем (необязательно)</div>
+      <input class="onb-inp" id="p-dislikes" data-ph="ph_dislikes" placeholder="Грибы, острое..."/>
+      <button class="btn-onb-next" onclick="onbGo(7)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 7: Cook time -->
+    <div class="onb-step" id="os7">
+      <div class="onb-eyebrow">Шаг 7 из 8</div>
+      <div class="onb-q" data-t="q_cook">Время на готовку?</div>
+      <div class="onb-hint" data-t="q_cook_h">Подберём рецепты под твой ритм</div>
+      <div class="onb-opts">
+        <button class="onb-opt" onclick="pick(this,'cook','minimal')"><div class="onb-opt-icon">⚡</div><div class="onb-opt-txt"><strong data-t="c_min">До 15 минут</strong><small data-t="c_min_s">Быстро и просто</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'cook','moderate')"><div class="onb-opt-icon">🍳</div><div class="onb-opt-txt"><strong data-t="c_mod">15–30 минут</strong><small data-t="c_mod_s">Люблю готовить</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'cook','enjoy')"><div class="onb-opt-icon">👨‍🍳</div><div class="onb-opt-txt"><strong data-t="c_enjoy">30–60 минут</strong><small data-t="c_enjoy_s">Готовка — удовольствие</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'cook','batch')"><div class="onb-opt-icon">📦</div><div class="onb-opt-txt"><strong data-t="c_batch">Batch cooking</strong><small data-t="c_batch_s">Готовлю раз в неделю</small></div><div class="onb-opt-check">✓</div></button>
+      </div>
+      <button class="btn-onb-next" onclick="onbGo(8)" data-t="next">Далее →</button>
+    </div>
+
+    <!-- Step 8: Budget -->
+    <div class="onb-step" id="os8">
+      <div class="onb-eyebrow">Шаг 8 из 8</div>
+      <div class="onb-q" data-t="q_budget">Бюджет на питание</div>
+      <div class="onb-hint" data-t="q_budget_h">Подберём продукты под твой кошелёк</div>
+      <div class="onb-opts">
+        <button class="onb-opt" onclick="pick(this,'budget','low')"><div class="onb-opt-icon">💶</div><div class="onb-opt-txt"><strong data-t="b_low">До €50 в неделю</strong><small data-t="b_low_s">Доступные продукты</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'budget','mid')"><div class="onb-opt-icon">💰</div><div class="onb-opt-txt"><strong data-t="b_mid">€50–100 в неделю</strong><small data-t="b_mid_s">Хорошее качество</small></div><div class="onb-opt-check">✓</div></button>
+        <button class="onb-opt" onclick="pick(this,'budget','high')"><div class="onb-opt-icon">⭐</div><div class="onb-opt-txt"><strong data-t="b_high">€100+ в неделю</strong><small data-t="b_high_s">Лосось, авокадо — норм</small></div><div class="onb-opt-check">✓</div></button>
+      </div>
+      <button class="btn-onb-next finish" onclick="finishOnb()" data-t="create_plan">✨ Создать мой план</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE: DASHBOARD (Личный кабинет)
+══════════════════════════════════════════ -->
+<div class="page" id="page-dashboard">
+
+  <!-- Sidebar (desktop) -->
+  <div class="sidebar">
+    <div class="sidebar-logo">Easy<span>Life</span></div>
+    <div class="sidebar-nav">
+      <div class="sidebar-item active" id="snav-home" onclick="dashTab('home',this)"><span class="sidebar-item-icon">📊</span><span data-t="nav_overview">Обзор</span></div>
+      <div class="sidebar-item" id="snav-plan" onclick="dashTab('plan',this)"><span class="sidebar-item-icon">📅</span><span data-t="nav_plan">Мой план</span></div>
+      <div class="sidebar-item" id="snav-log" onclick="dashTab('log',this)"><span class="sidebar-item-icon">✏️</span><span data-t="nav_log">Дневник питания</span></div>
+      <div class="sidebar-item" id="snav-profile" onclick="dashTab('profile',this)"><span class="sidebar-item-icon">👤</span><span data-t="nav_profile">Профиль</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-name" id="sb-name">—</div>
+      <div class="sidebar-user-sub" data-t="sub_status">Подписка активна ✓</div>
+      <div class="sidebar-logout" onclick="doLogout()">🚪 <span data-t="logout">Выйти</span></div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="dash-main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title" data-t="nav_overview">Обзор</div>
+      <div class="topbar-right">
+        <div class="topbar-notif">🔔<div class="notif-dot"></div></div>
+        <div class="topbar-avatar" id="dash-avatar">E</div>
+      </div>
+    </div>
+
+    <div class="dash-content">
+      <!-- ── HOME ── -->
+      <div class="dash-page active" id="dp-home">
+        <div class="cal-card">
+          <div class="cal-ring-box">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10"/>
+              <circle id="cal-ring" cx="60" cy="60" r="50" fill="none" stroke="var(--primary)" stroke-width="10" stroke-dasharray="314.2" stroke-dashoffset="314.2" stroke-linecap="round" style="transition:stroke-dashoffset .8s ease"/>
+            </svg>
+            <div class="cal-ring-center"><div class="cal-ring-pct" id="cal-pct">0%</div><div class="cal-ring-lbl" data-t="done">выполнено</div></div>
+          </div>
+          <div class="cal-info">
+            <div class="cal-lbl" data-t="today_nut">Питание сегодня</div>
+            <div class="cal-num" id="cal-eaten">0</div>
+            <div class="cal-target" id="cal-target-txt">/ — kcal</div>
+            <div class="macro-strips">
+              <div><div class="macro-strip-lbl" data-t="protein">Белки</div><div class="macro-strip-track"><div class="macro-strip-fill" id="ms-p" style="width:0%;background:var(--primary)"></div></div><div class="macro-strip-val" id="mv-p">—</div></div>
+              <div><div class="macro-strip-lbl" data-t="carbs">Углеводы</div><div class="macro-strip-track"><div class="macro-strip-fill" id="ms-c" style="width:0%;background:var(--yellow)"></div></div><div class="macro-strip-val" id="mv-c">—</div></div>
+              <div><div class="macro-strip-lbl" data-t="fat">Жиры</div><div class="macro-strip-track"><div class="macro-strip-fill" id="ms-f" style="width:0%;background:var(--blue)"></div></div><div class="macro-strip-val" id="mv-f">—</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-ico">🔥</div><div class="stat-card-lbl" data-t="remaining">Осталось</div><div class="stat-card-val"><span id="st-left">—</span> <span class="stat-card-unit">kcal</span></div></div>
+          <div class="stat-card"><div class="stat-card-ico">💧</div><div class="stat-card-lbl" data-t="water">Вода</div><div class="stat-card-val">1.8 <span class="stat-card-unit">л</span></div></div>
+          <div class="stat-card"><div class="stat-card-ico">🎯</div><div class="stat-card-lbl" data-t="goal_lbl">Цель</div><div class="stat-card-val" id="st-goal" style="font-size:18px">—</div></div>
+        </div>
+
+        <div class="section-hdr">
+          <div class="section-title" data-t="suggested_today">Рекомендуется сегодня</div>
+          <div class="section-link" onclick="dashTab('plan',document.getElementById('snav-plan'))" data-t="full_plan">Весь план →</div>
+        </div>
+        <div class="meal-cards">
+          <div class="meal-card" onclick="openRecipe('Овсянка с ягодами и мёдом','Завтрак')"><div class="meal-card-img" style="background:linear-gradient(135deg,#F0FDF4,#BBF7D0)">🥣<div class="meal-card-time">⏱ 10 мин</div></div><div class="meal-card-body"><div class="meal-card-name">Овсянка с ягодами</div><div class="meal-card-meta"><span data-t="breakfast">Завтрак</span><span class="meal-card-kcal">380 kcal</span></div></div></div>
+          <div class="meal-card" onclick="openRecipe('Куриная грудка с овощами и рисом','Обед')"><div class="meal-card-img" style="background:linear-gradient(135deg,#E8F8F2,#B0EDD5)">🍗<div class="meal-card-time">⏱ 25 мин</div></div><div class="meal-card-body"><div class="meal-card-name">Курица с овощами</div><div class="meal-card-meta"><span data-t="lunch">Обед</span><span class="meal-card-kcal">520 kcal</span></div></div></div>
+          <div class="meal-card" onclick="openRecipe('Греческий салат с фетой','Ужин')"><div class="meal-card-img" style="background:linear-gradient(135deg,#EBF2FF,#C0D8FF)">🥗<div class="meal-card-time">⏱ 10 мин</div></div><div class="meal-card-body"><div class="meal-card-name">Греческий салат</div><div class="meal-card-meta"><span data-t="dinner">Ужин</span><span class="meal-card-kcal">280 kcal</span></div></div></div>
+        </div>
+
+        <div class="ai-box">
+          <div class="ai-box-icon">🤖</div>
+          <div>
+            <div class="ai-box-badge"><span class="ai-box-badge-txt">✦ ИИ совет</span></div>
+            <div class="ai-box-text" id="home-tip" data-t="tip_ph">Нажми кнопку чтобы получить персональный совет на сегодня</div>
+            <button class="ai-box-btn" onclick="getHomeTip()" data-t="get_tip">Получить совет</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PLAN ── -->
+      <div class="dash-page" id="dp-plan">
+        <div class="plan-toolbar">
+          <div class="week-pills" id="week-pills"></div>
+          <button class="btn-shop" onclick="openShop()">🛒 <span data-t="shop_btn">Список покупок</span></button>
+        </div>
+        <div class="phase-banner" id="phase-banner" style="display:none">
+          <div><div class="phase-name" id="ph-name">—</div><div class="phase-desc" id="ph-desc">—</div></div>
+          <div><div class="phase-kcal" id="ph-kcal">—</div><div class="phase-kcal-lbl" data-t="kcal_day">kcal/день</div></div>
+        </div>
+        <div id="plan-area">
+          <div class="plan-loading"><div class="spin">✦</div><div class="plan-loading-txt" data-t="plan_load_txt">Загружаем план питания...</div></div>
+        </div>
+      </div>
+
+      <!-- ── LOG ── -->
+      <div class="dash-page" id="dp-log">
+        <div class="log-grid">
+          <div>
+            <div class="log-summary" style="margin-bottom:16px">
+              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" data-t="today_cal">Калории сегодня</div>
+              <div class="log-cal-num" id="log-eaten">0</div>
+              <div class="log-cal-of">/ <span id="log-target">—</span> kcal</div>
+              <div class="log-track"><div class="log-track-fill" id="log-fill" style="width:0%"></div></div>
+              <div class="log-macros">
+                <div class="lm"><div class="lm-val" id="lm-p">0g</div><div class="lm-lbl" data-t="protein">Белки</div></div>
+                <div class="lm"><div class="lm-val" id="lm-c">0g</div><div class="lm-lbl" data-t="carbs">Углеводы</div></div>
+                <div class="lm"><div class="lm-val" id="lm-f">0g</div><div class="lm-lbl" data-t="fat">Жиры</div></div>
+              </div>
+            </div>
+            <div class="ai-sug">
+              <div class="ai-sug-lbl">✦ <span data-t="ai_sug_lbl">ИИ рекомендует</span></div>
+              <div class="ai-sug-text" id="log-tip" data-t="ai_sug_ph">Добавь блюда — и я подскажу что съесть до конца дня!</div>
+              <button class="ai-sug-btn" onclick="getLogTip()" data-t="get_rec">Получить совет</button>
+            </div>
+          </div>
+          <div class="log-entries">
+            <div class="log-entries-hdr">
+              <div class="section-title" data-t="todays_meals">Блюда сегодня</div>
+              <button class="btn-add-meal" onclick="toggleLogForm()">+ <span data-t="add_meal">Добавить</span></button>
+            </div>
+            <div class="log-form" id="log-form">
+              <div class="log-form-row">
+                <input class="log-inp" id="lf-name" data-ph="ph_dish" placeholder="Блюдо"/>
+                <input class="log-inp log-inp-sm" id="lf-kcal" type="number" data-ph="ph_kcal" placeholder="kcal"/>
+              </div>
+              <div class="log-form-btns">
+                <button class="log-save-btn" onclick="addMeal()" data-t="add_btn">Добавить</button>
+                <button class="log-cancel-btn" onclick="toggleLogForm()" data-t="cancel">Отмена</button>
+              </div>
+            </div>
+            <div id="log-list"><div class="log-empty" data-t="no_entries">Пока ничего не добавлено</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div class="dash-page" id="dp-profile">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="prof-avatar">E</div>
+          <div>
+            <div class="profile-name" id="prof-name">—</div>
+            <div class="profile-email" id="prof-email">—</div>
+            <div class="profile-badge">✓ <span data-t="sub_status">Подписка активна</span></div>
+          </div>
+        </div>
+        <div class="profile-stats">
+          <div class="ps"><div class="ps-val" id="ps-kcal">—</div><div class="ps-lbl">kcal/день</div></div>
+          <div class="ps"><div class="ps-val" id="ps-weight">—</div><div class="ps-lbl" data-t="l_weight">Вес</div></div>
+          <div class="ps"><div class="ps-val" id="ps-target">—</div><div class="ps-lbl" data-t="l_target">Цель</div></div>
+        </div>
+        <div class="profile-cards">
+          <div class="profile-info-card">
+            <div class="pic-title" data-t="body_params">Параметры тела</div>
+            <div class="pic-row"><div class="pic-row-left"><span>👤</span><span data-t="l_age">Возраст</span></div><span class="pic-val" id="pr-age">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>⚧</span><span data-t="l_sex">Пол</span></div><span class="pic-val" id="pr-sex">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>📏</span><span data-t="l_height">Рост</span></div><span class="pic-val" id="pr-height">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>⚖️</span><span data-t="l_weight">Вес</span></div><span class="pic-val" id="pr-weight-v">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>🎯</span><span data-t="l_target">Цель по весу</span></div><span class="pic-val" id="pr-target-v">—</span></div>
+          </div>
+          <div class="profile-info-card">
+            <div class="pic-title" data-t="plan_params">Параметры плана</div>
+            <div class="pic-row"><div class="pic-row-left"><span>🎯</span><span data-t="goal_lbl">Цель</span></div><span class="pic-val" id="pr-goal">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>🏃</span><span data-t="activity">Активность</span></div><span class="pic-val" id="pr-act">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>🍽️</span><span data-t="diet_type">Питание</span></div><span class="pic-val" id="pr-diet">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>⚡</span><span data-t="cook_time">Готовка</span></div><span class="pic-val" id="pr-cook">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>💶</span><span data-t="budget">Бюджет</span></div><span class="pic-val" id="pr-budget">—</span></div>
+          </div>
+          <div class="profile-info-card" style="grid-column:span 2">
+            <div class="pic-title" data-t="restrictions">Ограничения и предпочтения</div>
+            <div class="pic-row"><div class="pic-row-left"><span>🚫</span><span data-t="allergies">Аллергии</span></div><span class="pic-val" id="pr-allergy">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>🏥</span><span data-t="conditions">Заболевания</span></div><span class="pic-val" id="pr-cond">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>❤️</span><span data-t="preferences">Предпочтения</span></div><span class="pic-val" id="pr-prefs">—</span></div>
+            <div class="pic-row"><div class="pic-row-left"><span>🚷</span><span data-t="dislikes">Не ем</span></div><span class="pic-val" id="pr-dislikes">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <div class="mobile-nav">
+    <div class="mob-nav-item active" id="mnav-home" onclick="dashTab('home',document.getElementById('snav-home'))">
+      <div class="mob-icon">🏠</div><div class="mob-lbl" data-t="nav_overview">Главная</div>
+    </div>
+    <div class="mob-nav-item" id="mnav-plan" onclick="dashTab('plan',document.getElementById('snav-plan'))">
+      <div class="mob-icon">📅</div><div class="mob-lbl" data-t="nav_plan">План</div>
+    </div>
+    <div class="mob-center" onclick="toggleLogForm();dashTab('log',document.getElementById('snav-log'))">✦</div>
+    <div class="mob-nav-item" id="mnav-log" onclick="dashTab('log',document.getElementById('snav-log'))">
+      <div class="mob-icon">✏️</div><div class="mob-lbl" data-t="nav_log">Дневник</div>
+    </div>
+    <div class="mob-nav-item" id="mnav-profile" onclick="dashTab('profile',document.getElementById('snav-profile'))">
+      <div class="mob-icon">👤</div><div class="mob-lbl" data-t="nav_profile">Профиль</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════ TRANSLATIONS ══════════════ */
+const T={
+  ru:{auth_sub:'Личный кабинет',tab_login:'Войти',tab_reg:'Регистрация',ph_email:'Email',ph_pass:'Пароль',ph_name:'Имя',ph_newpass:'Пароль (мин. 6 символов)',btn_login:'Войти',btn_reg:'Создать аккаунт',or:'или',google_btn:'Войти через Google',back_site:'Вернуться на сайт',auth_error_txt:'Проверьте введённые данные',back:'Назад',pay_h:'Выбери подписку',pay_sub:'Полная персонализация под тебя',popular:'Популярный',perk1:'30-дневный ИИ план питания',perk2:'Полные рецепты на каждое блюдо',perk3:'Список покупок на каждую неделю',perk4:'Трекер калорий и советы ИИ',perk5:'Новый план каждый месяц',trial:'7 дней бесплатно — начни прямо сейчас',pay_cta:'Начать бесплатный период →',pay_demo:'Продолжить без оплаты (демо)',step:'Шаг 1 из 8',q_goal:'Какова твоя цель?',q_goal_h:'Выбери главное — ИИ подстроит всё остальное',g_lose:'Похудеть',g_lose_s:'Снизить вес и жир',g_gain:'Набрать массу',g_gain_s:'Нарастить мышцы',g_maint:'Поддержать вес',g_maint_s:'Держать текущую форму',g_health:'Питаться здоровее',g_health_s:'Улучшить самочувствие',q_body:'Твои параметры',q_body_h:'Рассчитаем персональную норму калорий',l_age:'Возраст',l_sex:'Пол',l_height:'Рост, см',l_weight:'Вес, кг',l_target:'Цель по весу',female:'Женский',male:'Мужской',q_act:'Уровень активности',q_act_h:'Влияет на суточную норму калорий',a_sed:'Сидячий',a_sed_s:'Офис, мало движения',a_light:'Лёгкая',a_light_s:'1-2 тренировки в неделю',a_mod:'Умеренная',a_mod_s:'3-4 тренировки в неделю',a_high:'Высокая',a_high_s:'5+ тренировок',q_diet:'Тип питания',q_diet_h:'Это база для твоего плана',d_std:'Обычное',d_std_s:'Ем всё, европейская кухня',d_veg:'Вегетарианское',d_veg_s:'Без мяса и рыбы',d_vegan:'Веганское',d_vegan_s:'Только растительное',d_keto:'Кето',d_keto_s:'Низкоуглеводное',q_allergy:'Аллергии и непереносимость',q_allergy_h:'Исключим из всех блюд',all_gluten:'🌾 Глютен',all_lactose:'🥛 Лактоза',all_nuts:'🥜 Орехи',all_eggs:'🥚 Яйца',all_seafood:'🦐 Морепродукты',all_soy:'🫘 Соя',all_none:'✅ Нет аллергий',cond_lbl:'Заболевания (необязательно)',ph_cond:'Диабет, ГЭРБ...',q_prefs:'Что любишь есть?',q_prefs_h:'Выбери всё что нравится',p_chicken:'🍗 Курица',p_beef:'🥩 Говядина',p_fish:'🐟 Рыба',p_eggs:'🥚 Яйца',p_pasta:'🍝 Паста',p_rice:'🍚 Рис',p_salads:'🥗 Салаты',p_soup:'🍲 Супы',p_dairy:'🧀 Молочное',p_sweets:'🍫 Сладкое',dislikes_lbl:'Не ем (необязательно)',ph_dislikes:'Грибы, острое...',q_cook:'Время на готовку?',q_cook_h:'Подберём рецепты под твой ритм',c_min:'До 15 минут',c_min_s:'Быстро и просто',c_mod:'15–30 минут',c_mod_s:'Люблю готовить',c_enjoy:'30–60 минут',c_enjoy_s:'Готовка — удовольствие',c_batch:'Batch cooking',c_batch_s:'Готовлю раз в неделю',q_budget:'Бюджет на питание',q_budget_h:'Подберём продукты под твой кошелёк',b_low:'До €50 в неделю',b_low_s:'Доступные продукты',b_mid:'€50–100 в неделю',b_mid_s:'Хорошее качество',b_high:'€100+ в неделю',b_high_s:'Лосось, авокадо — норм',create_plan:'✨ Создать мой план',next:'Далее →',nav_overview:'Обзор',nav_plan:'Мой план',nav_log:'Дневник питания',nav_profile:'Профиль',sub_status:'Подписка активна ✓',logout:'Выйти',today_nut:'Питание сегодня',done:'выполнено',protein:'Белки',carbs:'Углеводы',fat:'Жиры',remaining:'Осталось',water:'Вода',goal_lbl:'Цель',suggested_today:'Рекомендуется сегодня',full_plan:'Весь план →',breakfast:'Завтрак',lunch:'Обед',dinner:'Ужин',snack:'Перекус',tip_ph:'Нажми кнопку чтобы получить совет',get_tip:'Получить совет',shop_btn:'Список покупок',plan_load_txt:'Загружаем план питания...',today_cal:'Калории сегодня',todays_meals:'Блюда сегодня',add_meal:'Добавить блюдо',ph_dish:'Название блюда',ph_kcal:'kcal',add_btn:'Добавить',cancel:'Отмена',no_entries:'Пока ничего не добавлено',ai_sug_lbl:'ИИ рекомендует',ai_sug_ph:'Добавь блюда — и я подскажу что съесть до конца дня!',get_rec:'Получить совет',body_params:'Параметры тела',plan_params:'Параметры плана',restrictions:'Ограничения и предпочтения',allergies:'Аллергии',conditions:'Заболевания',preferences:'Предпочтения',dislikes:'Не ем',activity:'Активность',diet_type:'Тип питания',cook_time:'Время готовки',budget:'Бюджет/нед',kcal_day:'kcal/день',week:'Неделя',
+    phase1:'Старт',phase1d:'Мягкий вход, формируем привычки (-350 kcal)',phase2:'Разгон',phase2d:'Чередование дней, разгон метаболизма (-350 kcal)',phase3:'Плато-брейкер',phase3d:'Зигзаг калорий — не даём организму привыкнуть (-300 kcal)',phase4:'Новая норма',phase4d:'Закрепляем результат и формируем устойчивые привычки (-200 kcal)',
+    add_to_diary:'+ В дневник питания',close:'Закрыть',copy_list:'📋 Скопировать',recipe_loading:'ИИ готовит рецепт...',shop_loading:'Составляем список покупок...',tip_loading:'Получаю совет...',rec_loading:'Анализирую дневник...',ingredients:'Ингредиенты',steps:'Приготовление',chef_tip:'Совет шефа',copied:'✓ Скопировано!',bought:'куплено',
+    goal_lose:'🔥 Похудение',goal_gain:'💪 Набор массы',goal_maint:'⚖️ Поддержание',goal_health:'🌿 Здоровое питание',
+    act_s:'Сидячий',act_l:'Лёгкая',act_m:'Умеренная',act_h:'Высокая',
+    diet_s:'Обычное',diet_v:'Вегетарианское',diet_vn:'Веганское',diet_k:'Кето',
+    cook_mn:'До 15 мин',cook_md:'15–30 мин',cook_en:'30–60 мин',cook_bt:'Batch cooking',
+    bud_l:'до €50/нед',bud_m:'€50–100/нед',bud_h:'€100+/нед',
+    no_allergy:'Нет аллергий',not_spec:'Не указано'},
+  en:{auth_sub:'Personal Account',tab_login:'Sign In',tab_reg:'Sign Up',ph_email:'Email',ph_pass:'Password',ph_name:'Name',ph_newpass:'Password (min 6 chars)',btn_login:'Sign In',btn_reg:'Create account',or:'or',google_btn:'Sign in with Google',back_site:'Back to site',auth_error_txt:'Please check your credentials',back:'Back',pay_h:'Choose your plan',pay_sub:'Fully personalised for you',popular:'Popular',perk1:'30-day AI meal plan',perk2:'Full recipes for every dish',perk3:'Weekly shopping list',perk4:'Calorie tracker & AI tips',perk5:'New plan every month',trial:'7 days free — start right now',pay_cta:'Start free trial →',pay_demo:'Continue without payment (demo)',step:'Step 1 of 8',q_goal:'What is your goal?',q_goal_h:'Choose the main one — AI will adapt the rest',g_lose:'Lose weight',g_lose_s:'Reduce body fat',g_gain:'Build muscle',g_gain_s:'Gain lean mass',g_maint:'Maintain weight',g_maint_s:'Keep current shape',g_health:'Eat healthier',g_health_s:'Improve wellbeing',q_body:'Your measurements',q_body_h:'Needed to calculate your calorie target',l_age:'Age',l_sex:'Sex',l_height:'Height, cm',l_weight:'Weight, kg',l_target:'Target weight',female:'Female',male:'Male',q_act:'Activity level',q_act_h:'Affects your daily calorie goal',a_sed:'Sedentary',a_sed_s:'Office, little movement',a_light:'Light',a_light_s:'1-2 workouts/week',a_mod:'Moderate',a_mod_s:'3-4 workouts/week',a_high:'High',a_high_s:'5+ workouts',q_diet:'Diet type',q_diet_h:'This is the base for your plan',d_std:'Standard',d_std_s:'I eat everything, European',d_veg:'Vegetarian',d_veg_s:'No meat or fish',d_vegan:'Vegan',d_vegan_s:'Plant-based only',d_keto:'Keto',d_keto_s:'Low-carb',q_allergy:'Allergies & intolerances',q_allergy_h:"We'll exclude these from all dishes",all_gluten:'🌾 Gluten',all_lactose:'🥛 Lactose',all_nuts:'🥜 Nuts',all_eggs:'🥚 Eggs',all_seafood:'🦐 Seafood',all_soy:'🫘 Soy',all_none:'✅ No allergies',cond_lbl:'Health conditions (optional)',ph_cond:'Diabetes, GERD...',q_prefs:'What do you love to eat?',q_prefs_h:'Select everything you enjoy',p_chicken:'🍗 Chicken',p_beef:'🥩 Beef',p_fish:'🐟 Fish',p_eggs:'🥚 Eggs',p_pasta:'🍝 Pasta',p_rice:'🍚 Rice',p_salads:'🥗 Salads',p_soup:'🍲 Soups',p_dairy:'🧀 Dairy',p_sweets:'🍫 Sweets',dislikes_lbl:"I don't eat (optional)",ph_dislikes:'Mushrooms, spicy...',q_cook:'Time available for cooking?',q_cook_h:"We'll pick recipes for your pace",c_min:'Under 15 min',c_min_s:'Quick and simple',c_mod:'15–30 min',c_mod_s:'Enjoy cooking',c_enjoy:'30–60 min',c_enjoy_s:'Cooking is fun',c_batch:'Batch cooking',c_batch_s:'Cook once a week',q_budget:'Weekly food budget',q_budget_h:"We'll suggest products for your wallet",b_low:'Under €50/week',b_low_s:'Affordable products',b_mid:'€50–100/week',b_mid_s:'Good quality',b_high:'€100+/week',b_high_s:'Salmon, avocado — no problem',create_plan:'✨ Create my plan',next:'Next →',nav_overview:'Overview',nav_plan:'My Plan',nav_log:'Food Diary',nav_profile:'Profile',sub_status:'Subscription active ✓',logout:'Sign out',today_nut:"Today's nutrition",done:'done',protein:'Protein',carbs:'Carbs',fat:'Fat',remaining:'Remaining',water:'Water',goal_lbl:'Goal',suggested_today:'Suggested today',full_plan:'Full plan →',breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snack:'Snack',tip_ph:'Tap to get a personal tip for today',get_tip:'Get tip',shop_btn:'Shopping list',plan_load_txt:'Loading meal plan...',today_cal:'Calories today',todays_meals:"Today's meals",add_meal:'Add meal',ph_dish:'Dish name',ph_kcal:'kcal',add_btn:'Add',cancel:'Cancel',no_entries:'Nothing added yet',ai_sug_lbl:'AI recommends',ai_sug_ph:"Add meals and I'll suggest what to eat for the rest of the day!",get_rec:'Get suggestion',body_params:'Body parameters',plan_params:'Plan parameters',restrictions:'Restrictions & preferences',allergies:'Allergies',conditions:'Conditions',preferences:'Preferences',dislikes:'Dislikes',activity:'Activity',diet_type:'Diet',cook_time:'Cooking',budget:'Budget/week',kcal_day:'kcal/day',week:'Week',
+    phase1:'Reset',phase1d:'Gentle start, building habits (-350 kcal)',phase2:'Acceleration',phase2d:'Alternating days, metabolism boost (-350 kcal)',phase3:'Plateau Breaker',phase3d:'Calorie zigzag to keep metabolism active (-300 kcal)',phase4:'New Normal',phase4d:'Locking in results, sustainable habits (-200 kcal)',
+    add_to_diary:'+ Add to food diary',close:'Close',copy_list:'📋 Copy',recipe_loading:'Preparing recipe...',shop_loading:'Building shopping list...',tip_loading:'Getting advice...',rec_loading:'Analysing diary...',ingredients:'Ingredients',steps:'Instructions',chef_tip:"Chef's tip",copied:'✓ Copied!',bought:'bought',
+    goal_lose:'🔥 Weight loss',goal_gain:'💪 Muscle gain',goal_maint:'⚖️ Maintenance',goal_health:'🌿 Healthy eating',
+    act_s:'Sedentary',act_l:'Light',act_m:'Moderate',act_h:'High',
+    diet_s:'Standard',diet_v:'Vegetarian',diet_vn:'Vegan',diet_k:'Keto',
+    cook_mn:'Under 15 min',cook_md:'15–30 min',cook_en:'30–60 min',cook_bt:'Batch cooking',
+    bud_l:'under €50/week',bud_m:'€50–100/week',bud_h:'€100+/week',
+    no_allergy:'No allergies',not_spec:'Not specified'}
+};
+T.es={...T.en,auth_sub:'Cuenta personal',tab_login:'Entrar',tab_reg:'Registro',btn_login:'Entrar',btn_reg:'Crear cuenta',or:'o',google_btn:'Entrar con Google',back_site:'Volver al sitio',create_plan:'✨ Crear mi plan',next:'Siguiente →',nav_overview:'Inicio',nav_plan:'Plan',nav_log:'Diario',nav_profile:'Perfil',logout:'Salir',breakfast:'Desayuno',lunch:'Almuerzo',dinner:'Cena',snack:'Merienda',week:'Semana',copied:'✓ Copiado!'};
+
+let lang = sessionStorage.getItem('lang') || 'ru';
+function t(k){return(T[lang]&&T[lang][k])||T.ru[k]||k}
+function applyT(){
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const v=t(el.getAttribute('data-t'));
+    if(v&&!['INPUT','OPTION'].includes(el.tagName))el.textContent=v;
+  });
+  document.querySelectorAll('[data-ph]').forEach(el=>{
+    const v=t(el.getAttribute('data-ph'));if(v)el.placeholder=v;
+  });
+}
+
+/* ══ STATE ══ */
+const APP = {
+  user: null,         // {name, email}
+  profile: null,      // onboarding data
+  tdee: 0,
+  meals: [],          // food log
+  weekPlan: null,
+  curWeek: 1
+};
+const SEL = {goal:null,activity:null,diet:null,cook:null,budget:null,allergy:[],prefs:[]};
+let onbStep = 1;
+let recipeData = null;
+
+/* ══ ROUTING ══ */
+function goto(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goLanding(){
+  window.location.href = 'index.html';
+}
+
+/* ══ AUTH ══ */
+function switchAuthTab(tab){
+  document.getElementById('tab-login-btn').classList.toggle('active', tab==='login');
+  document.getElementById('tab-reg-btn').classList.toggle('active', tab==='register');
+  document.getElementById('auth-login-form').style.display = tab==='login'?'block':'none';
+  document.getElementById('auth-reg-form').style.display = tab==='register'?'block':'none';
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if(!email || !pass){ showAuthError(); return; }
+  // Check if user exists in localStorage (simulating a database)
+  const users = JSON.parse(localStorage.getItem('el_users')||'{}');
+  if(users[email] && users[email].pass === pass){
+    APP.user = {name: users[email].name, email};
+    APP.profile = users[email].profile;
+    APP.tdee = users[email].tdee || 0;
+    if(APP.profile){
+      setupDash();
+      goto('dashboard');
+    } else {
+      goto('payment');
+    }
+  } else {
+    showAuthError();
+  }
+}
+
+function doRegister(){
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  if(!name||!email||pass.length<6){ showAuthError(); return; }
+  const users = JSON.parse(localStorage.getItem('el_users')||'{}');
+  if(users[email]){ showAuthError(); return; }
+  users[email] = {name, pass, profile:null, tdee:0};
+  localStorage.setItem('el_users', JSON.stringify(users));
+  APP.user = {name, email};
+  goto('payment');
+}
+
+function showAuthError(){
+  document.getElementById('auth-error').classList.add('show');
+}
+
+function doLogout(){
+  APP.user = null; APP.profile = null; APP.tdee = 0; APP.meals = []; APP.weekPlan = null;
+  Object.keys(SEL).forEach(k => SEL[k] = Array.isArray(SEL[k]) ? [] : null);
+  goto('auth');
+}
+
+/* ══ PAYMENT ══ */
+function doPay(){ goto('onboarding'); }
+
+/* ══ ONBOARDING ══ */
+function pick(el, key, val){
+  el.closest('.onb-opts').querySelectorAll('.onb-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  SEL[key] = val;
+}
+function chip(el, key, val){
+  el.classList.toggle('sel');
+  if(!SEL[key]) SEL[key]=[];
+  const i=SEL[key].indexOf(val);
+  if(i>-1) SEL[key].splice(i,1); else SEL[key].push(val);
+}
+function onbGo(n){
+  document.querySelectorAll('.onb-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('os'+n).classList.add('active');
+  onbStep=n;
+  document.getElementById('onb-fill').style.width=(n/8*100)+'%';
+  document.getElementById('onb-counter').textContent=n+' / 8';
+}
+function onbBack(){
+  if(onbStep>1) onbGo(onbStep-1);
+  else goto('payment');
+}
+
+function calcTDEE(){
+  const age=parseInt(document.getElementById('p-age').value)||28;
+  const h=parseInt(document.getElementById('p-height').value)||168;
+  const w=parseInt(document.getElementById('p-weight').value)||68;
+  const sex=document.getElementById('p-sex').value;
+  const bmr=sex==='male'?10*w+6.25*h-5*age+5:10*w+6.25*h-5*age-161;
+  const m={sedentary:1.2,light:1.375,moderate:1.55,high:1.725};
+  let tdee=Math.round(bmr*(m[SEL.activity]||1.55));
+  if(SEL.goal==='lose')tdee-=350;
+  if(SEL.goal==='gain')tdee+=300;
+  return tdee;
+}
+
+const GM={lose:'goal_lose',gain:'goal_gain',maintain:'goal_maint',health:'goal_health'};
+const AM={sedentary:'act_s',light:'act_l',moderate:'act_m',high:'act_h'};
+const DM={standard:'diet_s',vegetarian:'diet_v',vegan:'diet_vn',keto:'diet_k'};
+const CM={minimal:'cook_mn',moderate:'cook_md',enjoy:'cook_en',batch:'cook_bt'};
+const BM={low:'bud_l',mid:'bud_m',high:'bud_h'};
+const PHASES=[
+  {k:'phase1',dk:'phase1d',adj:-350},
+  {k:'phase2',dk:'phase2d',adj:-350},
+  {k:'phase3',dk:'phase3d',adj:-300},
+  {k:'phase4',dk:'phase4d',adj:-200}
+];
+
+function finishOnb(){
+  const tdee = calcTDEE();
+  APP.tdee = tdee;
+  APP.profile = {
+    goal:SEL.goal, activity:SEL.activity, diet:SEL.diet, cook:SEL.cook, budget:SEL.budget,
+    allergies:[...SEL.allergy], prefs:[...SEL.prefs],
+    age:parseInt(document.getElementById('p-age').value)||28,
+    sex:document.getElementById('p-sex').value,
+    height:parseInt(document.getElementById('p-height').value)||168,
+    weight:parseInt(document.getElementById('p-weight').value)||68,
+    target:parseInt(document.getElementById('p-target').value)||null,
+    conditions:document.getElementById('p-conditions').value,
+    dislikes:document.getElementById('p-dislikes').value,
+    tdee
+  };
+  // Save to "database"
+  if(APP.user?.email){
+    const users = JSON.parse(localStorage.getItem('el_users')||'{}');
+    if(users[APP.user.email]){
+      users[APP.user.email].profile = APP.profile;
+      users[APP.user.email].tdee = tdee;
+      localStorage.setItem('el_users', JSON.stringify(users));
+    }
+  }
+  setupDash();
+  goto('dashboard');
+  buildWeekPills();
+}
+
+/* ══ DASHBOARD SETUP ══ */
+function setupDash(){
+  const p=APP.profile, nm=APP.user?.name||'User';
+  const init=nm.charAt(0).toUpperCase();
+  // Topbar & sidebar
+  ['sb-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=nm});
+  ['dash-avatar','prof-avatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=init});
+  document.getElementById('prof-name').textContent=nm;
+  document.getElementById('prof-email').textContent=APP.user?.email||'';
+  if(!p) return;
+  // Calorie display
+  document.getElementById('cal-target-txt').textContent='/ '+p.tdee+' kcal';
+  document.getElementById('log-target').textContent=p.tdee;
+  document.getElementById('st-left').textContent=p.tdee;
+  document.getElementById('st-goal').textContent=t(GM[p.goal]||'');
+  // Macros
+  const pr=Math.round(p.weight*1.8), fat=Math.round(p.tdee*.28/9), carbs=Math.round((p.tdee-pr*4-fat*9)/4);
+  document.getElementById('mv-p').textContent=pr+'g';
+  document.getElementById('mv-c').textContent=carbs+'g';
+  document.getElementById('mv-f').textContent=fat+'g';
+  setTimeout(()=>{
+    document.getElementById('ms-p').style.width=Math.min(pr/200*100,100)+'%';
+    document.getElementById('ms-c').style.width=Math.min(carbs/350*100,100)+'%';
+    document.getElementById('ms-f').style.width=Math.min(fat/100*100,100)+'%';
+  },400);
+  // Profile page
+  document.getElementById('ps-kcal').textContent=p.tdee;
+  document.getElementById('ps-weight').textContent=p.weight+'kg';
+  document.getElementById('ps-target').textContent=p.target?p.target+'kg':'—';
+  document.getElementById('pr-age').textContent=p.age;
+  document.getElementById('pr-sex').textContent=p.sex==='male'?t('male'):t('female');
+  document.getElementById('pr-height').textContent=p.height+' cm';
+  document.getElementById('pr-weight-v').textContent=p.weight+' kg';
+  document.getElementById('pr-target-v').textContent=p.target?p.target+' kg':t('not_spec');
+  document.getElementById('pr-goal').textContent=t(GM[p.goal]||'');
+  document.getElementById('pr-act').textContent=t(AM[p.activity]||'');
+  document.getElementById('pr-diet').textContent=t(DM[p.diet]||'');
+  document.getElementById('pr-cook').textContent=t(CM[p.cook]||'')||'—';
+  document.getElementById('pr-budget').textContent=t(BM[p.budget]||'')||'—';
+  document.getElementById('pr-allergy').textContent=p.allergies?.length?p.allergies.join(', '):t('no_allergy');
+  document.getElementById('pr-cond').textContent=p.conditions||t('not_spec');
+  document.getElementById('pr-prefs').textContent=p.prefs?.length?p.prefs.join(', '):t('not_spec');
+  document.getElementById('pr-dislikes').textContent=p.dislikes||t('not_spec');
+  buildWeekPills();
+}
+
+/* ══ DASHBOARD NAV ══ */
+function dashTab(tab, sidebarEl){
+  document.querySelectorAll('.dash-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('dp-'+tab).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(n=>n.classList.remove('active'));
+  if(sidebarEl) sidebarEl.classList.add('active');
+  ['home','plan','log','profile'].forEach(id=>{
+    const mn=document.getElementById('mnav-'+id);
+    if(mn) mn.classList.toggle('active', id===tab);
+  });
+  const titles={home:t('nav_overview'),plan:t('nav_plan'),log:t('nav_log'),profile:t('nav_profile')};
+  document.getElementById('topbar-title').textContent=titles[tab]||'';
+  if(tab==='plan' && !APP.weekPlan && APP.tdee) loadPlan(1);
+}
+
+/* ══ FOOD LOG ══ */
+const EMOJIS=['🥗','🍗','🥣','🍝','🥩','🐟','🥚','🥦','🍲','🍎','🥑','🧀'];
+function updateCalDisplay(){
+  const total=APP.meals.reduce((s,m)=>s+m.kcal,0);
+  const pct=Math.min(total/(APP.tdee||1),1);
+  document.getElementById('cal-ring').style.strokeDashoffset=314.2*(1-pct);
+  document.getElementById('cal-pct').textContent=Math.round(pct*100)+'%';
+  document.getElementById('cal-eaten').textContent=total;
+  const left=Math.max((APP.tdee||0)-total,0);
+  document.getElementById('st-left').textContent=left;
+  document.getElementById('log-eaten').textContent=total;
+  document.getElementById('log-fill').style.width=Math.min(pct*100,100)+'%';
+  document.getElementById('log-target').textContent=APP.tdee||'—';
+}
+function toggleLogForm(){ document.getElementById('log-form').classList.toggle('open'); }
+function addMeal(){
+  const name=document.getElementById('lf-name').value.trim();
+  const kcal=parseInt(document.getElementById('lf-kcal').value)||0;
+  if(!name) return;
+  APP.meals.push({id:Date.now(),name,kcal});
+  document.getElementById('lf-name').value='';
+  document.getElementById('lf-kcal').value='';
+  document.getElementById('log-form').classList.remove('open');
+  renderMeals(); updateCalDisplay();
+}
+function delMeal(id){ APP.meals=APP.meals.filter(m=>m.id!==id); renderMeals(); updateCalDisplay(); }
+function renderMeals(){
+  const el=document.getElementById('log-list');
+  if(!APP.meals.length){el.innerHTML='<div class="log-empty" data-t="no_entries">'+t('no_entries')+'</div>';return}
+  el.innerHTML=APP.meals.map((m,i)=>`
+    <div class="log-entry">
+      <div class="log-entry-emoji">${EMOJIS[i%EMOJIS.length]}</div>
+      <div class="log-entry-name">${m.name}</div>
+      <div class="log-entry-kcal">${m.kcal} kcal</div>
+      <button class="log-del" onclick="delMeal(${m.id})">✕</button>
+    </div>`).join('');
+}
+
+/* ══ AI CALLS ══ */
+function profileSummary(){
+  const p=APP.profile||{};
+  const eaten=APP.meals.reduce((s,m)=>s+m.kcal,0);
+  const ml=APP.meals.map(m=>`${m.name}(${m.kcal})`).join(',')||'nothing';
+  return `Profile: ${p.age||'?'}yo ${p.sex||'?'}, ${p.weight||'?'}kg, ${p.height||'?'}cm. Goal: ${SEL.goal}. Activity: ${SEL.activity}. Diet: ${SEL.diet}. Budget: ${SEL.budget}. Cook: ${SEL.cook}. Allergies: ${p.allergies?.join(',')||'none'}. Conditions: ${p.conditions||'none'}. Dislikes: ${p.dislikes||'none'}. Prefs: ${p.prefs?.join(',')||'none'}. TDEE: ${p.tdee||0}. Eaten today: ${eaten}kcal (${ml}).`;
+}
+async function ai(prompt, maxTokens=1500){
+  const r = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, maxTokens }),
+  });
+  if (!r.ok) throw new Error('Server error');
+  const d = await r.json();
+  return d.text || '';
+}
+async function getHomeTip(){
+  const el=document.getElementById('home-tip');
+  el.textContent=t('tip_loading');
+  try{ el.textContent=await ai(`${profileSummary()} Give a short (2-3 sentences) motivating nutrition tip for today. Language: ${lang}. No markdown.`); }
+  catch{ el.textContent=t('tip_ph'); }
+}
+async function getLogTip(){
+  const el=document.getElementById('log-tip');
+  el.textContent=t('rec_loading');
+  const left=Math.max((APP.tdee||0)-APP.meals.reduce((s,m)=>s+m.kcal,0),0);
+  try{ el.textContent=await ai(`${profileSummary()} ${left}kcal remaining today. Suggest specific dishes to eat for remaining meals. 3-4 sentences, specific food with approximate calories. Language: ${lang}. No markdown.`); }
+  catch{ el.textContent=t('ai_sug_ph'); }
+}
+
+/* ══ PLAN ══ */
+function buildWeekPills(){
+  const pills=document.getElementById('week-pills');
+  if(!pills) return;
+  pills.innerHTML='';
+  for(let w=1;w<=4;w++){
+    const btn=document.createElement('button');
+    btn.className='week-pill'+(w===1?' active':'');
+    btn.textContent=t('week')+' '+w;
+    btn.onclick=()=>{document.querySelectorAll('.week-pill').forEach(p=>p.classList.remove('active'));btn.classList.add('active');loadPlan(w)};
+    pills.appendChild(btn);
+  }
+}
+async function loadPlan(week){
+  APP.curWeek=week; APP.weekPlan=null;
+  const phase=PHASES[week-1];
+  const phKcal=(APP.tdee||1800)+(phase?.adj||0);
+  const banner=document.getElementById('phase-banner');
+  banner.style.display='flex';
+  document.getElementById('ph-name').textContent=t('week')+' '+week+': '+t(phase.k);
+  document.getElementById('ph-desc').textContent=t(phase.dk);
+  document.getElementById('ph-kcal').textContent=phKcal;
+  const area=document.getElementById('plan-area');
+  area.innerHTML=`<div class="plan-loading"><div class="spin">✦</div><div class="plan-loading-txt">${t('week')} ${week}...</div></div>`;
+  const p=APP.profile||{};
+  const DN={ru:['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],en:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],es:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']};
+  const days=DN[lang]||DN.en;
+  const today=new Date().getDay();
+  const mKeys=['breakfast','lunch','dinner','snack'];
+  const mLabels=[t('breakfast'),t('lunch'),t('dinner'),t('snack')];
+  try{
+    const prompt=`Create 7-day meal plan (week ${week}/4, phase: ${t(phase.k)}) for: ${p.age||28}yo ${p.sex||'female'}, ${p.weight||68}kg, ${p.height||168}cm. Goal: ${SEL.goal||'health'}. Diet: ${SEL.diet||'standard'}. Budget: ${SEL.budget||'mid'}. Cook: ${SEL.cook||'moderate'}. Allergies: ${p.allergies?.join(',')||'none'}. Dislikes: ${p.dislikes||'none'}. Prefs: ${p.prefs?.join(',')||'none'}. Calories: ${phKcal}/day. European cuisine. Phase: ${t(phase.dk)}.
+Return ONLY valid JSON array of 7 objects, no markdown, no explanation:
+[{"breakfast":"dish name (Nkcal)","lunch":"dish (Nkcal)","dinner":"dish (Nkcal)","snack":"dish (Nkcal)","total":N},...]
+All dish names in language: ${lang}.`;
+    const txt=await ai(prompt,1600);
+    APP.weekPlan=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    area.innerHTML=`<div class="plan-grid">${APP.weekPlan.map((d,i)=>{
+      const isToday=(i===today-1);
+      return `<div class="plan-day${isToday?' today':''}">
+        <div class="plan-day-head">
+          <span class="plan-day-name">${days[i]}</span>
+          ${isToday?`<span class="plan-today-badge">★</span>`:''}
+          <span class="plan-day-kcal">≈${d.total}</span>
+        </div>
+        ${mKeys.map((key,mi)=>`
+          <div class="plan-meal-slot" onclick="openRecipe('${esc(d[key])}','${mLabels[mi]}')">
+            <div class="plan-slot-lbl">${mLabels[mi]}</div>
+            <div class="plan-slot-val">${cleanDish(d[key])}</div>
+          </div>`).join('')}
+      </div>`;
+    }).join('')}</div><div style="height:20px"></div>`;
+  }catch{
+    area.innerHTML=`<div class="plan-loading"><div style="font-size:28px">⚡</div><div class="plan-loading-txt">Anthropic API key required for AI generation</div></div>`;
+  }
+}
+function cleanDish(s){ return s.replace(/\s*\(\d+\s*(kcal|ккал)\)/i,'').trim(); }
+function esc(s){ return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+/* ══ RECIPE ══ */
+async function openRecipe(rawDish, mealType){
+  const dish=cleanDish(rawDish);
+  recipeData={name:dish,kcal:0};
+  document.getElementById('rm-title').textContent=dish;
+  document.getElementById('rm-chips').innerHTML=`<span class="modal-chip">${mealType||''}</span>`;
+  document.getElementById('rm-load-txt').textContent=t('recipe_loading');
+  document.getElementById('rm-body').innerHTML=`<div class="modal-loading"><div class="spin">✦</div><div class="modal-loading-txt">${t('recipe_loading')}</div></div>`;
+  document.getElementById('modal-recipe').classList.add('open');
+  const p=APP.profile||{};
+  try{
+    const prompt=`Create full recipe for: "${dish}". User: ${p.age||28}yo ${p.sex||'female'}, goal: ${SEL.goal||'health'}, diet: ${SEL.diet||'standard'}, allergies: ${p.allergies?.join(',')||'none'}, cook pref: ${SEL.cook||'moderate'}.
+Return ONLY valid JSON, no markdown:
+{"title":"full name","kcal":N,"protein":N,"carbs":N,"fat":N,"cook_time":"Xmin","difficulty":"Easy/Medium","ingredients":[{"name":"x","qty":"y"}],"steps":["step1","step2"],"tip":"one chef tip"}
+All text in language: ${lang}.`;
+    const r=JSON.parse((await ai(prompt)).replace(/```json|```/g,'').trim());
+    recipeData={name:r.title,kcal:r.kcal};
+    document.getElementById('rm-title').textContent=r.title;
+    document.getElementById('rm-chips').innerHTML=`<span class="modal-chip">⏱ ${r.cook_time}</span><span class="modal-chip">${r.difficulty}</span>`;
+    document.getElementById('rm-body').innerHTML=`
+      <div class="nut-grid">
+        <div class="nut-chip"><div class="nut-val">${r.kcal}</div><div class="nut-lbl">kcal</div></div>
+        <div class="nut-chip"><div class="nut-val">${r.protein}g</div><div class="nut-lbl">${t('protein')}</div></div>
+        <div class="nut-chip"><div class="nut-val">${r.carbs}g</div><div class="nut-lbl">${t('carbs')}</div></div>
+        <div class="nut-chip"><div class="nut-val">${r.fat}g</div><div class="nut-lbl">${t('fat')}</div></div>
+      </div>
+      <div class="recipe-cols">
+        <div>
+          <div class="modal-section-title">${t('ingredients')}</div>
+          ${r.ingredients.map(i=>`<div class="ing-row"><span>${i.name}</span><span class="ing-qty">${i.qty}</span></div>`).join('')}
+          ${r.tip?`<div class="chef-tip-box" style="margin-top:16px"><div class="chef-tip-lbl">✦ ${t('chef_tip')}</div><div class="chef-tip-body">${r.tip}</div></div>`:''}
+        </div>
+        <div>
+          <div class="modal-section-title">${t('steps')}</div>
+          ${r.steps.map((s,i)=>`<div class="step-row"><div class="step-badge">${i+1}</div><div class="step-body">${s}</div></div>`).join('')}
+        </div>
+      </div>`;
+  }catch{
+    document.getElementById('rm-body').innerHTML='<div class="modal-loading" style="color:var(--muted)">Anthropic API key required</div>';
+  }
+}
+function addRecipeToDiary(){
+  if(!recipeData?.kcal) return;
+  APP.meals.push({id:Date.now(),name:recipeData.name,kcal:recipeData.kcal});
+  renderMeals(); updateCalDisplay();
+  closeModal('modal-recipe');
+  dashTab('log', document.getElementById('snav-log'));
+}
+
+/* ══ SHOPPING ══ */
+async function openShop(){
+  document.getElementById('sm-title').textContent='🛒 '+t('shop_btn');
+  document.getElementById('sm-sub').textContent=t('week')+' '+APP.curWeek;
+  document.getElementById('sm-load-txt').textContent=t('shop_loading');
+  document.getElementById('sm-body').innerHTML=`<div class="modal-loading"><div class="spin">✦</div><div class="modal-loading-txt">${t('shop_loading')}</div></div>`;
+  document.getElementById('sm-prog').textContent='';
+  document.getElementById('modal-shop').classList.add('open');
+  if(!APP.weekPlan){document.getElementById('sm-body').innerHTML='<div class="modal-loading">Generate a week plan first</div>';return}
+  const dishes=APP.weekPlan.flatMap(d=>[d.breakfast,d.lunch,d.dinner,d.snack]).map(cleanDish).join(', ');
+  const p=APP.profile||{};
+  try{
+    const prompt=`Shopping list for 28 meals: ${dishes}. User: diet ${SEL.diet||'standard'}, allergies: ${p.allergies?.join(',')||'none'}, budget: ${SEL.budget||'mid'}. Consolidate all ingredients, remove duplicates, group by category.
+Return ONLY valid JSON, no markdown: {"categories":[{"name":"category","items":[{"name":"product","qty":"amount+unit"}]}]}
+Language: ${lang}.`;
+    const data=JSON.parse((await ai(prompt,2000)).replace(/```json|```/g,'').trim());
+    document.getElementById('sm-body').innerHTML=data.categories.map(cat=>`
+      <div class="shop-cat-head">${cat.name}</div>
+      ${cat.items.map(item=>`
+        <div class="shop-item" onclick="this.classList.toggle('checked');updateShopProg()">
+          <div class="shop-checkbox">✓</div>
+          <div class="shop-item-name">${item.name}</div>
+          <div class="shop-item-qty">${item.qty}</div>
+        </div>`).join('')}`).join('');
+    updateShopProg();
+  }catch{document.getElementById('sm-body').innerHTML='<div class="modal-loading">API key required</div>'}
+}
+function updateShopProg(){
+  const total=document.querySelectorAll('.shop-item').length;
+  const checked=document.querySelectorAll('.shop-item.checked').length;
+  document.getElementById('sm-prog').textContent=checked>0?`${checked}/${total} ${t('bought')}`:'';
+}
+function copyShop(){
+  let txt=`🛒 ${t('week')} ${APP.curWeek}\n\n`;
+  document.querySelectorAll('.shop-item:not(.checked)').forEach(i=>{
+    txt+=`□ ${i.querySelector('.shop-item-name').textContent} — ${i.querySelector('.shop-item-qty').textContent}\n`;
+  });
+  navigator.clipboard.writeText(txt).then(()=>{
+    const b=document.getElementById('sm-copy-btn');
+    b.textContent=t('copied');
+    setTimeout(()=>b.textContent=t('copy_list'),2500);
+  });
+}
+
+/* ══ MODALS ══ */
+function closeModal(id,e){
+  if(!e||e.target===document.getElementById(id))
+    document.getElementById(id).classList.remove('open');
+}
+
+/* ══ INIT ══ */
+function init(){
+  applyT();
+  // Check intent from landing page
+  const intent = sessionStorage.getItem('intent');
+  if(intent==='login') switchAuthTab('login');
+  if(intent==='register') switchAuthTab('register');
+  sessionStorage.removeItem('intent');
+  // Already logged in? Go to dashboard
+  // (In production this would check a real session/token)
+}
+
+init();
+</script>
+</body>
+</html>
